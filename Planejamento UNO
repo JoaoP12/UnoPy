@@ -1,0 +1,87 @@
+UNO text game Python.
+Cards:
+- 19 Blue cards - 0 to 9
+- 19 Green cards - 0 to 9
+- 19 Red cards - 0 to 9
+- 19 Yellow cards - 0 to 9
+- 8 Skip cards - 2 each in Blue, Green, Red and Yellow
+- 8 Reverse cards - 2 each in Blue, Green, Red and Yellow
+- 8 Draw 2 cards - 2 each in Blue, Green, Red, Yellow
+- 4 Wild cards
+- 4 Wild draw cards
+- 4 Blank Cards (Won't Be used)
+
+Classes:
+- Deck: a stacklike class that will deal the player the first card of the deck.
+- Card: a class that will store the card's colors and names.
+- Game: a class that will be the 'host' of the game, it will call all the other classes and will start the game. In the init it needs to have the amount of players that will play.
+- Player: stores the names of the players, his/her cards and points.
+- specialCard(Card): stores the special cards, their function and colors.
+- normalCard(Card): stores the normalCards and their colors.
+
+Functions:
+	class Deck:
+		- self.__init__(self, cards): Receives the list with all the cards
+		- self.pop(): Remove the 'head' card of the deck and returns it to the player's deck
+		- self.shuffle_deck(): Takes the self.cards list and returns it shuffled.
+	class Card:
+		- self.__init__(self, color, name): Receives card's colors, name
+	class normalCard(Card):
+		- self.__init__(self, color, name, number): Receives the argument number to store a new normal card.
+			-super().__init__(color, name)
+			-self.points = number
+		- self.get_points(self): returns the amount of points the card values
+	class specialCard(Card):
+		- self.__init__(self, color, name, function): Receives the argument function to store a new special card.
+			- super().__init__(color, name)
+			- self.points = self.get_points_value(self.name)
+		- self.get_points_value(self, card_name): filters the card name and returns how many points does it value according to its function (Need to see the scoring section of the rules)
+		- self.get_points(self): returns the variable self.points that determine how many points does the current card value
+	class Player:
+		- self.__init__(self, name, cards, points): receives the player's name, cards and points.
+		- self.increase_points(self, amount): increase the argument points to the player's self.points.
+		- self.get_name(self): returns the player's name
+		- self.play(self): draws a card to the game
+		- self.get_score(self): returns the amount of points the player has.
+		- self.get_cards(self): returns the cards of the player.
+		- self.get_card_to_deck(self): adds a new card to the player's deck.
+	class Game:
+		- self.__init__(self, players, deck):  Receives the list of players playing and the deck.
+			- self.number_of_player = len(players)
+		- self.change_sequence(self): changes the sequence of the players if the revert card is drawn.
+		- self.scoreboard(self): shows the users the scoreboard with the scores of each player.
+		- self.start_game(self): will start the game.
+		- self.start_game_with_two_players(self): starts the game but following the rules for only 2 players.
+		- self.start_game_with_partners(self): starts the game following the partners' game rules.
+		- self.round(self): will be called in self.start_game() and will call the necessary methods to play the game.
+		- self.skip_player(self): will return the next player to play after a skip card is drawn.
+		- self.draw_card_to_player(self, player, card): adds the number of cards it needs to the player specified. The card parameter is needed to know how many cards does the player need to draw. (Wild +4 or Draw 2 card)
+		- self.count_points(self, player): returns the amount of points the player has in his/her hands.
+		- self.challenge_uno(self): One of the ways to play. Following the challenge Uno's rules.
+
+Code:
+	It's gonna has one script for each class and one script where the game will be executed (the inherited classes will be in the same script as the parent class):
+	class Deck --> deck.py
+	class Game --> game.py
+	class Player --> player.py
+	class Card --> card.py
+	class specialCard --> card.py
+	class normalCard --> card.py
+	Script where the other classes will be used and the game will happen --> UNO_text_game.py
+
+	UNO_text_game.py:
+		functions:
+		- menu(): prints a menu and returns the option the user chose
+			- Menu with the options below:
+				- Play a two players game
+				- Play a +2 players game
+				- Play a partners game (4 players only)
+				- Play Challenge UNO
+				- Exit
+		- main(): the unique function that will be called in the code unindented. Will call the other functions and will "host" the game.
+
+
+
+
+
+ 
