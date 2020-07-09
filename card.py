@@ -7,7 +7,7 @@ class Card:
         self.color = color
         self.card_name = name
 
-class normalCard(Card):
+class NormalCard(Card):
     '''
     This class inherits from Card class and it is responsible for keeping track of the
     normal cards, that doesn't have a special function, just a color and number
@@ -25,7 +25,7 @@ class normalCard(Card):
         '''
         return self.card_points
 
-class specialCard(Card):
+class SpecialCard(Card):
     '''
     Stores the special cards of the game, those ones that have a special function
     such as reverse, draw 2 cards and, draw 4 cards etc.
