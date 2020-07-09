@@ -1,8 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jul  9 12:28:03 2020
+class Card:
+    def __init__(self, color, name):
+        self.color = color
+        self.card_name = name
 
-@author: jp-lo
-"""
+class normalCard(Card):
+    
+    def __init__(self):
+        pass
 
-
+class specialCard(Card):
+    
+    def __init__(self):
+        pass
+        
