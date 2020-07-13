@@ -8,16 +8,15 @@ class Deck:
         
     def draw_card(self):
         """
-        Returns the top card of the deck to the
-        player's cards.
-        """
-        has_cards = self.still_has_cards()
-        if has_cards:
-            card = self.cards.pop(-1)
-            return card
+        Returns the top card of the deck to the player's cards.
         
-        print("The deck is empty, you cannot take a card that isn't there\n")
-        print("Creating new deck with the played cards...")
+        P.S.: This function will never be called if the deck is empty.
+        That will be more understandable when the class Game be implemented.
+        That class will check if it has cards on the deck, and if doesn't, it
+        will call the create_new_deck_with_played_cards method.
+        """
+        
+        return self.cards.pop(-1)
         
     def shuffle_deck(self):
         """
@@ -29,28 +28,33 @@ class Deck:
         """
         Returns False if the deck is empty, otherwise returns True
         """
-        if self.cards is not None:
+        if self.cards != []:
             return True
         
         return False
     
-    def create_new_deck_with_played_cards(self):
+    def create_new_deck_with_played_cards(self, played_cards):
         """
         It takes the played cards and create a new deck, then it shuffles the
         new deck and returns it.
         """
+        pass
     
 card1 = NormalCard('Green', 'One', 1)
 card2 = NormalCard('Yellow', 'Seven', 7)
 card3 = SpecialCard("Red", "Reverse", "Reverse")
 
 new_deck = Deck([card1, card2, card3])
+
 drown_card = new_deck.draw_card()
 print(drown_card.card_name)
+
 drown_card = new_deck.draw_card()
 print(drown_card.card_name)
+
 drown_card = new_deck.draw_card()
 print(drown_card.card_name)
+
 drown_card = new_deck.draw_card()
 
 
