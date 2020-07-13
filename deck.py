@@ -1,10 +1,18 @@
 from card import Card
 from card import NormalCard
 from card import SpecialCard
-# from random import random
+from random import random
 class Deck:
     def __init__(self, cards):
         self.cards = cards
+        
+    
+    def get_deck(self):
+        """
+        Returns the deck 'updated', after shuffling it.
+        """
+        self.shuffle_deck()
+        return self.cards
         
     def draw_card(self):
         """
@@ -22,8 +30,20 @@ class Deck:
         """
         Takes the self.cards list and shuffle using randint function.
         """
-        pass
-    
+        amount_of_cards_available = len(self.cards)
+        indexes_shuffled = []
+        deck_shuffled = []
+        for i in range(amount_of_cards_available):
+            num = random.randint(0, amount_of_cards_available)
+            if num not in indexes_shuffled:
+                indexes_shuffled.append(num)
+        
+        for i in range(amount_of_cards_available):
+            deck_shuffled.append(self.cards[indexes_shuffled[i]])
+        
+        self.cards = deck_shuffled
+            
+        
     def still_has_cards(self):
         """
         Returns False if the deck is empty, otherwise returns True
@@ -35,26 +55,9 @@ class Deck:
     
     def create_new_deck_with_played_cards(self, played_cards):
         """
-        It takes the played cards and create a new deck, then it shuffles the
-        new deck and returns it.
+        It takes the played cards and create a new deck, then it returns
+        the self.get_deck() method that shuffles the deck and returns it
         """
         pass
     
-card1 = NormalCard('Green', 'One', 1)
-card2 = NormalCard('Yellow', 'Seven', 7)
-card3 = SpecialCard("Red", "Reverse", "Reverse")
-
-new_deck = Deck([card1, card2, card3])
-
-drown_card = new_deck.draw_card()
-print(drown_card.card_name)
-
-drown_card = new_deck.draw_card()
-print(drown_card.card_name)
-
-drown_card = new_deck.draw_card()
-print(drown_card.card_name)
-
-drown_card = new_deck.draw_card()
-
 
