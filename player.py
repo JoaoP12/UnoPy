@@ -55,9 +55,10 @@ class Player:
             
         else:
             print("You don't have any playable cards. Drawing one card from deck...")
-            card_drawn = deck.draw_card()
-            print(f"You've drawn the card below:\n")
-            print(f"{card_drawn.name} -- {card_drawn.color}")
+            
+            self.draw_card_to_players_deck()
+            card_drawn = self.cards[-1]
+            
             if game.valid_play(card_drawn):
                 user_choice = input("This card is playable. Do you want to play it? (y/n)")
                 if user_choice != "y" and user_choice != "n":
@@ -106,3 +107,12 @@ class Player:
             cards_total_points += cd.get_card_points()
         
         return cards_total_points
+    
+    def draw_card_to_players_deck(self):
+        """
+        Adds a card to the player's card calling the method from the Deck class draw_card()
+        and prints the card the player got.
+        """
+        self.cards.append(deck.draw_card())
+        print(f"The card you got is \n {self.cards[-1].name} -- {self.cards[-1].color}")
+        
