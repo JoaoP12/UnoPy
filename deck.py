@@ -58,6 +58,5 @@ class Deck:
         It takes the played cards and create a new deck, then it returns
         the self.get_deck() method that shuffles the deck and returns it
         """
-        pass
-    
-
+        self.cards = played_cards
+        return self.get_deck()
