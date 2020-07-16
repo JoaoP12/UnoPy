@@ -34,7 +34,7 @@ class Player:
         First, filters all the cards that are playable and put them into a list.
         If the list does not have any cards inside it, the player draws a card from the deck
         and the method checks if the card drawn is playable, if so, the player has the option to
-        play it, otherwise it will return none
+        play it, otherwise it calls the self.skip() method.
         """
         cards = self.get_cards()
         card_index = 0
@@ -73,7 +73,6 @@ class Player:
                     return self.skip_play()
                 
             return self.skip_play()
-            
         
     def skip_play(self):
         
@@ -87,4 +86,23 @@ class Player:
         Returns the cards of the player.
         """
         return self.cards
+    
+    
+    def get_total_score(self):
+        """
+        Returns the amount of points the player has. That is done by returning the instance
+        variable self.total_points
+        """
+        return self.total_points
+    
+    def get_cards_points(self):
+        """
+        Iterate trough the player's cards and return the total amount of points all the cards
+        values together.
+        """
+        cards = self.get_cards()
+        cards_total_points = 0
+        for cd in cards:
+            cards_total_points += cd.get_card_points()
         
+        return cards_total_points
