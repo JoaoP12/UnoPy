@@ -1,6 +1,6 @@
-from deck import Deck as deck
-from game import Game as game # Game is not implemented yet
-import card
+from deck import Deck
+from game import Game # Game is not implemented yet
+from card import Card, NormalCard, SpecialCard as cd
 
 
 class Player:
@@ -31,50 +31,28 @@ class Player:
     
     def play(self):
         """
-        First, filters all the cards that are playable and put them into a list.
-        If the list does not have any cards inside it, the player draws a card from the deck
-        and the method checks if the card drawn is playable, if so, the player has the option to
-        play it, otherwise it calls the self.skip() method.
+        Calls the helper method self.print_cards() to print all the cards, then it tries to take the user
+        input and returns the card according to the index the user chose.
         """
         cards = self.get_cards()
-        card_index = 0
-        valid_cards = [possible_valid_card for possible_valid_card in cards if game.valid_card(possible_valid_card)]
+        card_index = self.print_cards()
         
-        if valid_cards is not None:
-            for possible_card in valid_cards:
-                print(f"{card_index} --> {possible_card.name} -- {possible_card.color}\n")
-                card_index += 0
-            user_choice = int(input("Type the number of the card you wanna play: "))
-            if user_choice >= card_index or user_choice < 0:
-               while user_choice >= card_index or user_choice < 0:
-                   user_choice = int(input("Please, type a valid number: "))
+        try:
+            user_choice = int(input("What's the card you wanna play?\n"))
             
-            card_to_be_played_index = cards.index(valid_cards[user_choice])
-            card_to_be_played = self.cards.pop(card_to_be_played_index)
-            return card_to_be_played
-            
-        else:
-            print("You don't have any playable cards. Drawing one card from deck...")
-            
-            self.draw_card_to_players_deck()
-            card_drawn = self.cards[-1]
-            
-            if game.valid_play(card_drawn):
-                user_choice = input("This card is playable. Do you want to play it? (y/n)")
-                if user_choice != "y" and user_choice != "n":
-                    while user_choice != "y" and user_choice != "n":
-                        print("Please, enter a valid option.")
-                        user_choice = input("Do you want to play the drawn card? (y/n)")
-                if user_choice == "y":
+            if user_choice < 0 or user_choice >= card_index:
+                print("Please, enter a valid number")
+                while user_choice < 0 or user_choice >= card_index:
+                    card_index = self.print_cards()
+                    user_choice = int(input("What's the card you wanna play?\n"))
                     
-                    return card_drawn
-                
-                else:
-                    
-                    return self.skip_play()
-                
-            return self.skip_play()
+            return cards[user_choice]
         
+        except ValueError:
+            print("Please, digit a valid NUMBER.")
+            
+            return self.play()
+            
     def skip_play(self):
         
         """
@@ -108,11 +86,26 @@ class Player:
         
         return cards_total_points
     
-    def draw_card_to_players_deck(self):
+    def draw_card_to_players_deck(self, current_deck):
         """
         Adds a card to the player's card calling the method from the Deck class draw_card()
         and prints the card the player got.
         """
-        self.cards.append(deck.draw_card())
+        self.cards.append(current_deck.draw_card())
         print(f"The card you got is \n {self.cards[-1].name} -- {self.cards[-1].color}")
+    
+    def print_cards(self):
+        """
+        Helper method that prints all the player's card then return the card index resulted
+        from printing all the cards
+        """
+        
+        cards = self.get_cards()
+        card_index = 0
+        
+        for card in cards:
+            print(f"{card_index} --> {card.name} -- {card.color}")
+            card_index += 1
+            
+        return card_index
         
