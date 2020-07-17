@@ -58,6 +58,7 @@ Functions:
 		- self.draw_card_to_player(self, player, card): adds the number of cards it needs to the player specified. The card parameter is needed to know how many cards does the player need to draw. (Wild +4 or Draw 2 card)
 		- self.count_points(self, player): returns the amount of points the player has in his/her hands.
 		- self.challenge_uno(self): One of the ways to play. Following the challenge Uno's rules.
+		- self.valid_play(self): ensure the player's card is a valid play.
 
 Code:
 	It's gonna has one script for each class and one script where the game will be executed (the inherited classes will be in the same script as the parent class):
