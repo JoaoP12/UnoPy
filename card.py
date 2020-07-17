@@ -5,7 +5,7 @@ class Card:
     
     def __init__(self, color, name):
         self.color = color
-        self.card_name = name
+        self.name = name
 
 class NormalCard(Card):
     '''
@@ -15,7 +15,7 @@ class NormalCard(Card):
     
     def __init__(self, color, name, points):
         super().__init__(color, name)
-        self.card_points = points
+        self.points = points
     
     def get_card_points(self):
         '''
@@ -23,7 +23,7 @@ class NormalCard(Card):
         card_points instance variable. The normal cards have their points based on
         their number, being number == points.
         '''
-        return self.card_points
+        return self.points
 
 class SpecialCard(Card):
     '''
@@ -61,5 +61,5 @@ class SpecialCard(Card):
         '''
         special_cards_name = self.get_special_cards_name()
         for name in special_cards_name.keys():
-            if name == self.card_name:
+            if name == self.name:
                 return special_cards_name[name]
