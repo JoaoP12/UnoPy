@@ -1,7 +1,5 @@
 from deck import Deck
-from game import Game # Game is not implemented yet
 from card import Card, NormalCard, SpecialCard as cd
-
 
 class Player:
     """
@@ -52,13 +50,6 @@ class Player:
             print("Please, digit a valid NUMBER.")
             
             return self.play()
-            
-    def skip_play(self):
-        
-        """
-        Helper method that returns None. That means the player didn't play.
-        """
-        return None
     
     def get_cards(self):
         """
@@ -81,8 +72,8 @@ class Player:
         """
         cards = self.get_cards()
         cards_total_points = 0
-        for cd in cards:
-            cards_total_points += cd.get_card_points()
+        for card in cards:
+            cards_total_points += card.get_card_points()
         
         return cards_total_points
     
