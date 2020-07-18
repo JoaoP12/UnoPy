@@ -19,20 +19,12 @@ class Player:
         self.total_points += amount
         print(f"Player {self.name} has {self.total_points} now.")
     
-    def get_name(self):
-        
-        """
-        Returns the player's name
-        """
-        
-        return self.name
-    
     def play(self):
         """
         Calls the helper method self.print_cards() to print all the cards, then it tries to take the user
         input and returns the card according to the index the user chose.
         """
-        cards = self.get_cards()
+        
         card_index = self.print_cards()
         
         try:
@@ -44,35 +36,20 @@ class Player:
                     card_index = self.print_cards()
                     user_choice = int(input("What's the card you wanna play?\n"))
                     
-            return cards[user_choice]
+            return self.cards[user_choice]
         
         except ValueError:
             print("Please, digit a valid NUMBER.")
             
             return self.play()
     
-    def get_cards(self):
-        """
-        Returns the cards of the player.
-        """
-        return self.cards
-    
-    
-    def get_total_score(self):
-        """
-        Returns the amount of points the player has. That is done by returning the instance
-        variable self.total_points
-        """
-        return self.total_points
-    
     def get_cards_points(self):
         """
         Iterate trough the player's cards and return the total amount of points all the cards
         values together.
         """
-        cards = self.get_cards()
         cards_total_points = 0
-        for card in cards:
+        for card in self.cards:
             cards_total_points += card.get_card_points()
         
         return cards_total_points
@@ -91,10 +68,9 @@ class Player:
         from printing all the cards
         """
         
-        cards = self.get_cards()
         card_index = 0
         
-        for card in cards:
+        for card in self.cards:
             print(f"{card_index} --> {card.name} -- {card.color}")
             card_index += 1
             

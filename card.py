@@ -16,15 +16,7 @@ class NormalCard(Card):
     def __init__(self, color, name, points):
         super().__init__(color, name)
         self.points = points
-    
-    def get_card_points(self):
-        '''
-        Returns the amount of points the card values. That is stored in the self.
-        card_points instance variable. The normal cards have their points based on
-        their number, being number == points.
-        '''
-        return self.points
-
+        
 class SpecialCard(Card):
     '''
     Stores the special cards of the game, those ones that have a special function
