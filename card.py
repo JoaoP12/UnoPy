@@ -52,6 +52,7 @@ class SpecialCard(Card):
         Then it returns how many points does the card values according to its name.
         '''
         special_cards_name = self.get_special_cards_name()
+        
         for name in special_cards_name.keys():
             if name == self.name:
                 return special_cards_name[name]

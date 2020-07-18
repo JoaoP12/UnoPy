@@ -6,11 +6,16 @@ from card import Card, NormalCard, SpecialCard
 
 
 '''
-    deixado --> 17/07/20
-    Terminar de implentar self.valid_play(). Tem que lembrar de colocar quando o player joga uma carta de 
-    mudar cor ou a +4 para ver se ele está jogando a cor certa. Além disso tem que lembrar de implementar
-    uma função que pergunta para o player qual a cor que ele vai escolher quando ele jogar a mudança de cor.
-
+    deixado --> 18/07/20
+    
+    **** Implementar testes para deck.py
+    
+    **** Terminar single_round
+    
+    **** Usar class Enum para poder filtras as cartas mais facilmente
+    
+    **** Filtrar cartas no single_round para poder fazer as ações necessárias no caso do jogador jogar carta especial
+    
 '''
 
 class Game:
@@ -19,6 +24,7 @@ class Game:
         self.number_of_players = len(self.players)
         self.gdeck = gdeck
         self.round = 0
+        self.current_color_chosen_by_wild_card = None
     
     def start_game(self):
         pass
@@ -73,14 +79,26 @@ class Game:
         the last card played in the game and checks if both the card that wants to enter the game
         and the card already played are compatible between them.
         """
+        
         last_card_played = cards_played[-1]
+        
         if type(possible_card) == NormalCard and type(last_card_played) == NormalCard:
             if possible_card.color == last_card_played.color or possible_card.number == last_card_played.number:
                 return True
             
             return False
         
-    
+        elif type(last_card_played) == SpecialCard and type(possible_card) == SpecialCard and last_card_played.name == possible_card.name:
+            
+            return True
+        
+        elif last_card_played.name == "Wild" or last_card_played.name == "Wild draw four":
+            
+            if possible_card.color == self.current_color_chosen_by_wild_card:
+                return True
+            
+            return False
+            
     def show_scoreboard(self):
         """
         Iterate through the players and show their names and total points
