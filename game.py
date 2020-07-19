@@ -1,20 +1,21 @@
 from deck import Deck
 from player import Player
-from card import Card, NormalCard, SpecialCard
+from card import Card, NormalCard, SpecialCard, CardType
 
 
 
 
 '''
-    deixado --> 18/07/20
+    deixado --> 19/07/20
     
     **** Implementar testes para deck.py
     
     **** Terminar single_round
-    
-    **** Usar class Enum para poder filtras as cartas mais facilmente
-    
-    **** Filtrar cartas no single_round para poder fazer as ações necessárias no caso do jogador jogar carta especial
+        * Determinar se um player ganhou ou não
+        
+        * Determinar se é a última carta do jogador e printa UNO!
+        
+        * Implementar funções especiais Reverse, Skip e Draw.
     
 '''
 
@@ -55,6 +56,28 @@ class Game:
                 
                 if self.valid_play(possible_card, cards_played):
                     print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
+                    
+                    if type(possible_card) == SpecialCard:
+                        card_type = CardType(possible_card.name)
+                        
+                        if card_type == CardType.WILD:
+                            self.current_color_chosen_by_wild_card = self.colors_menu()
+                            print(f"Now the color of the round is {self.current_color_chosen_by_wild_card}")
+                            
+                            # Parei aqui
+                            
+                        elif card_type == CardType.WILDFOUR:
+                            pass
+                        
+                        elif card_type == CardType.DRAWTWO:
+                            pass
+                        
+                        elif card_type == CardType.SKIP:
+                            pass
+                        
+                        else:
+                            pass
+                        
                     cards_played.append(possible_card)
                 else:
                     print("Game: That's not a valid card! Try again!")
@@ -109,3 +132,33 @@ class Game:
         
     def player_won(self, players):
         pass
+    
+    def colors_menu():
+        """
+        Takes the input of the player that played a Wild card, in the input he/shee needs to
+        choose the color they want to impose in the game.
+        """
+        
+        colors_list = ['Blue', 'Green', 'Red', 'Yellow']
+        print("Choose a color:\n")
+        
+        while True:
+            try:
+                color = int(input("1 - Blue\n2 - Green\n3 - Red\n4 - Yellow\n"))
+                
+            except ValueError:
+                while True:
+                    
+                    try:
+                        print("Please, type a valid option.\n")
+                        color = int(input("1 - Blue\n2 - Green\n3 - Red\n4 - Yellow\n"))
+                        break
+                    
+                    except ValueError:
+                        continue
+                    
+            if color not in [number for number in range(1, 5)]:
+                continue
+            
+            else:
+                return colors_list[color-1]
