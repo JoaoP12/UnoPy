@@ -1,3 +1,5 @@
+from enum import Enum
+
 class Card:
     '''
     The parent class of the cards. It keeps track of the cards' names and colors.
@@ -56,3 +58,10 @@ class SpecialCard(Card):
         for name in special_cards_name.keys():
             if name == self.name:
                 return special_cards_name[name]
+    
+class CardType(Enum):
+    WILD = "Wild"
+    WILDFOUR = "Wild draw four"
+    DRAWTWO = "Draw two"
+    SKIP = "Skip"
+    REVERSE = "Reverse"
