@@ -74,5 +74,4 @@ class Player:
             print(f"{card_index} --> {card.name} -- {card.color}")
             card_index += 1
             
-        return card_index
-        
+        return card_indexs
