@@ -52,40 +52,49 @@ class Game:
             for player in self.players:
                 
                 print(f"{player.name}'s turn!")
-                possible_card = player.play()
-                
-                if self.valid_play(possible_card, cards_played):
-                    print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
-                    
-                    if type(possible_card) == SpecialCard:
-                        card_type = CardType(possible_card.name)
-                        
-                        if card_type == CardType.WILD:
-                            self.current_color_chosen_by_wild_card = self.colors_menu()
-                            print(f"Now the color of the round is {self.current_color_chosen_by_wild_card}")
-                            
-                            # Parei aqui
-                            
-                        elif card_type == CardType.WILDFOUR:
-                            pass
-                        
-                        elif card_type == CardType.DRAWTWO:
-                            pass
-                        
-                        elif card_type == CardType.SKIP:
-                            pass
-                        
-                        else:
-                            pass
-                        
-                    cards_played.append(possible_card)
+                if self.has_valid_cards(player.cards, cards_played) == False:
+                    print(f"It seems the player {player.name} doesn't have a playable card...\n")
+                    print(f"Drawing a card to {player.name}'s deck...\n")
+                    player.draw_card_to_players_deck(self.gdeck)
+                    if self.has_valid_cards(player.cards, cards_played) == False:
+                        print(f"{player.name} still does not have a playable card!\n")
+                        print(f"{player.name} skipped!\n")
+                        continue
                 else:
-                    print("Game: That's not a valid card! Try again!")
-                    while self.valid_play(possible_card, cards_played) == False:
-                        possible_card = player.play()
+                    possible_card = player.play()
+                    
+                    if self.valid_play(possible_card, cards_played):
+                        print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
                         
-                    print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
-                    cards_played.append(possible_card)
+                        if type(possible_card) == SpecialCard:
+                            card_type = CardType(possible_card.name)
+                            
+                            if card_type == CardType.WILD:
+                                self.current_color_chosen_by_wild_card = self.colors_menu()
+                                print(f"Now the color of the round is {self.current_color_chosen_by_wild_card}")
+                                
+                                cards_played.append(possible_card)
+                                
+                            elif card_type == CardType.WILDFOUR:
+                                pass
+                            
+                            elif card_type == CardType.DRAWTWO:
+                                pass
+                            
+                            elif card_type == CardType.SKIP:
+                                pass
+                            
+                            else:
+                                pass
+                            
+                        cards_played.append(possible_card)
+                    else:
+                        print("Game: That's not a valid card! Try again!")
+                        while self.valid_play(possible_card, cards_played) == False:
+                            possible_card = player.play()
+                            
+                        print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
+                        cards_played.append(possible_card)
     
     def skip_player(self):
         pass
@@ -162,3 +171,18 @@ class Game:
             
             else:
                 return colors_list[color-1]
+        
+    def has_valid_cards(self, players_cards, cards_played):
+        """
+        Iterate trough the player's cards and return True if the player has at least one playable card.
+        Otherwise return False.
+        """
+        for card in players_cards:
+            if self.valid_play(card, cards_played):
+                return True
+        
+        return False
+        
+            
+        
+        
