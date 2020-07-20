@@ -44,11 +44,11 @@ class Deck:
         self.cards = deck_shuffled
             
         
-    def still_has_cards(self):
+    def is_empty(self):
         """
-        Returns False if the deck is empty, otherwise returns True
+        Returns True if the deck is empty, otherwise returns False
         """
-        if self.cards != []:
+        if self.cards == []:
             return True
         
         return False
@@ -58,5 +58,6 @@ class Deck:
         It takes the played cards and create a new deck, then it returns
         the self.get_deck() method that shuffles the deck and returns it
         """
+        print("Creating new deck with the cards played...\n")
         self.cards = played_cards
         return self.get_deck()
