@@ -35,6 +35,8 @@ class Game:
         This method "plays" a single round of the game calling the necessary methods and classes
         and print messages so the players know what is happening.
         """
+        skip_player = False
+        number_of_cards_next_player_draws = None #  This variable stores how many cards does the 'next' player needs to draw
         cards_played = []
         self.round += 1
         
@@ -51,7 +53,25 @@ class Game:
         while self.player_won(self.players) == None:
             for player in self.players:
                 
+                if number_of_cards_next_player_draws is not None:
+                    print(f"Player {player.name} needs to draw {next_player_draws} cards due to the last card played!\n")
+                    print(f"Drawing cards to {player.name}'s deck...\n")
+                    
+                    for time in range(0, number_of_cards_next_player_draws):
+                        
+                        if self.gdeck.is_empty():
+                            self.gdeck = self.gdeck.create_new_deck_with_played_cards(cards_played)
+                            
+                        player.draw_card_to_players_deck(self.gdeck)
+                        
+                    continue
+                elif skip_player:
+                    print(f"{player.name} skipped!\n")
+                    skip_player = False
+                    continue
+                
                 print(f"{player.name}'s turn!")
+                
                 if self.has_valid_cards(player.cards, cards_played) == False:
                     print(f"It seems the player {player.name} doesn't have a playable card...\n")
                     print(f"Drawing a card to {player.name}'s deck...\n")
@@ -70,24 +90,24 @@ class Game:
                             card_type = CardType(possible_card.name)
                             
                             if card_type == CardType.WILD:
-                                self.current_color_chosen_by_wild_card = self.colors_menu()
+                                self.current_color_chosen_by_wild_card = self.ask_color()
                                 print(f"Now the color of the round is {self.current_color_chosen_by_wild_card}")
                                 
-                                cards_played.append(possible_card)
-                                
                             elif card_type == CardType.WILDFOUR:
-                                pass
+                                self.current_color_chosen_by_wild_card = self.ask_color()
+                                number_of_cards_next_player_draws = 4
                             
                             elif card_type == CardType.DRAWTWO:
-                                pass
+                                number_of_cards_next_player_draws = 2
                             
                             elif card_type == CardType.SKIP:
-                                pass
+                                skip_player = True
                             
                             else:
                                 pass
                             
                         cards_played.append(possible_card)
+                        
                     else:
                         print("Game: That's not a valid card! Try again!")
                         while self.valid_play(possible_card, cards_played) == False:
@@ -95,9 +115,6 @@ class Game:
                             
                         print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
                         cards_played.append(possible_card)
-    
-    def skip_player(self):
-        pass
     
     def count_points(self):
         pass
@@ -142,7 +159,7 @@ class Game:
     def player_won(self, players):
         pass
     
-    def colors_menu():
+    def ask_color():
         """
         Takes the input of the player that played a Wild card, in the input he/shee needs to
         choose the color they want to impose in the game.
