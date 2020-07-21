@@ -1,7 +1,9 @@
 from card import Card
 from card import NormalCard
 from card import SpecialCard
-from random import random
+from random import randint
+import unittest
+
 class Deck:
     def __init__(self, cards):
         self.cards = cards
@@ -33,8 +35,9 @@ class Deck:
         amount_of_cards_available = len(self.cards)
         indexes_shuffled = []
         deck_shuffled = []
-        for i in range(amount_of_cards_available):
-            num = random.randint(0, amount_of_cards_available)
+        
+        while len(indexes_shuffled) < amount_of_cards_available:
+            num = randint(0, amount_of_cards_available-1)
             if num not in indexes_shuffled:
                 indexes_shuffled.append(num)
         
@@ -61,3 +64,28 @@ class Deck:
         print("Creating new deck with the cards played...\n")
         self.cards = played_cards
         return self.get_deck()
+
+
+class TestDeck(unittest.TestCase):
+    def test_empty_deck(self):
+        deck = Deck([])
+        self.assertListEqual(deck.cards, [])
+
+    def test_deck_with_cards(self):
+        deck = Deck([1,2,3,4,5])
+        self.assertListEqual(deck.cards, [1,2,3,4,5])
+
+    def test_shuffled_deck_other_than_base_deck(self):
+        deck = Deck([1,2,3,4,5])
+        cards_before = deck.cards.copy()
+        deck.shuffle_deck()
+        self.assertNotEqual(deck.cards, cards_before)
+
+    def test_draw_card(self):
+        deck = Deck([1,2,3,4,5])
+        card = deck.draw_card()
+        self.assertEqual(card, 5)
+        self.assertEqual(len(deck.cards), 4)
+
+if __name__ == "__main__":
+    unittest.main()
