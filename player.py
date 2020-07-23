@@ -74,4 +74,15 @@ class Player:
             print(f"{card_index} --> {card.name} -- {card.color}")
             card_index += 1
             
-        return card_indexs
+        return card_index
+    
+    def remove_card_played(self, card_played):
+        """
+        Removes the card the player played and print Uno! if he/she is with just 2 cards.
+        """
+        card_index = self.cards.index(card_played)
+        if len(self.cards) == 2:
+            print(f"{self.name}: Uno!")
+            
+        del(self.cards(card_index))
+        
