@@ -1,6 +1,6 @@
 from deck import Deck
 from player import Player
-from card import Card, NormalCard, SpecialCard, CardType
+from card import Card, NormalCard, SpecialCard, CardType, NoMoreCards
 
 
 
@@ -38,6 +38,7 @@ class Game:
         skip_player = False
         number_of_cards_next_player_draws = None #  This variable stores how many cards does the 'next' player needs to draw
         cards_played = []
+        pace = 1
         self.round += 1
         
         print("Starting round...")
@@ -51,21 +52,18 @@ class Game:
         
         print(f"****** Round {self.round} ******\n")
         while self.player_won(self.players) == None:
-            for player in self.players:
-                
+            for p in range(0, len(self.players), pace):
+                player = self.players[p]
                 if number_of_cards_next_player_draws is not None:
-                    print(f"Player {player.name} needs to draw {next_player_draws} cards due to the last card played!\n")
+                    print(f"Player {player.name} needs to draw {number_of_cards_next_player_draws} cards due to the last card played!\n")
                     print(f"Drawing cards to {player.name}'s deck...\n")
                     
                     for time in range(0, number_of_cards_next_player_draws):
-                        
-                        if self.gdeck.is_empty():
-                            self.gdeck = self.gdeck.create_new_deck_with_played_cards(cards_played)
+                        self.draw_card_to_player(player, cards_played)
                             
-                        player.draw_card_to_players_deck(self.gdeck)
-                        
-                    continue
-                elif skip_player:
+                    skip_player = True
+                
+                if skip_player:
                     print(f"{player.name} skipped!\n")
                     skip_player = False
                     continue
@@ -75,7 +73,9 @@ class Game:
                 if self.has_valid_cards(player.cards, cards_played) == False:
                     print(f"It seems the player {player.name} doesn't have a playable card...\n")
                     print(f"Drawing a card to {player.name}'s deck...\n")
-                    player.draw_card_to_players_deck(self.gdeck)
+                    
+                    self.draw_card_to_player(player, cards_played)
+                    
                     if self.has_valid_cards(player.cards, cards_played) == False:
                         print(f"{player.name} still does not have a playable card!\n")
                         print(f"{player.name} skipped!\n")
@@ -85,6 +85,8 @@ class Game:
                     
                     if self.valid_play(possible_card, cards_played):
                         print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
+                        
+                        self.get_card_from_player(player, possible_card)
                         
                         if type(possible_card) == SpecialCard:
                             card_type = CardType(possible_card.name)
@@ -103,8 +105,8 @@ class Game:
                             elif card_type == CardType.SKIP:
                                 skip_player = True
                             
-                            else:
-                                pass
+                            elif card_type == CardType.REVERSE:
+                                pace = self.revert_game(pace)
                             
                         cards_played.append(possible_card)
                         
@@ -200,6 +202,29 @@ class Game:
         
         return False
         
-            
+    def revert_game(self, pace):
+        """
+        Takes the pace (that determines the order the players) and returns it times -1, that will literally
+        revert the game.
+        """
+        return pace * -1
+    
+    def draw_card_to_player(self, player, cards_played):
+        '''
+        Checks if there are any cards left on the deck to draw, if there aren't, it creates a new deck with
+        the cards already played.
+        '''
+        try:
+            player.draw_card_to_players_deck(self.gdeck)
+                            
+        except NoMoreCards:
+            self.gdeck = self.gdeck.create_new_deck_with_played_cards(cards_played)
+            player.draw_card_to_players_deck(self.gdeck)
+    
+    def get_card_from_player(self, player, card_to_be_taken):
+        '''
+        Takes the card that was played and pops it from the player's card at the same time that returns it.
+        '''
         
+        player.remove_card_played(card_to_be_taken)
         
