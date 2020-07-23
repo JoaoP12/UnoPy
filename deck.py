@@ -20,13 +20,13 @@ class Deck:
         """
         Returns the top card of the deck to the player's cards.
         
-        P.S.: This function will never be called if the deck is empty.
-        That will be more understandable when the class Game be implemented.
-        That class will check if it has cards on the deck, and if doesn't, it
-        will call the create_new_deck_with_played_cards method.
+        If the deck has no more cards, it raises the exception NoMoreCards.
         """
-        
-        return self.cards.pop(-1)
+        if self.is_empty():
+            raise NoMoreCards
+            
+        else:
+            return self.cards.pop(-1)
         
     def shuffle_deck(self):
         """
@@ -89,3 +89,6 @@ class TestDeck(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+    
+class NoMoreCards(Exception):
+    pass
