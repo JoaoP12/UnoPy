@@ -2,23 +2,6 @@ from deck import Deck
 from player import Player
 from card import Card, NormalCard, SpecialCard, CardType, NoMoreCards
 
-
-
-
-'''
-    deixado --> 19/07/20
-    
-    **** Implementar testes para deck.py
-    
-    **** Terminar single_round
-        * Determinar se um player ganhou ou não
-        
-        * Determinar se é a última carta do jogador e printa UNO!
-        
-        * Implementar funções especiais Reverse, Skip e Draw.
-    
-'''
-
 class Game:
     def __init__(self, players, gdeck):
         self.players = players
@@ -28,7 +11,15 @@ class Game:
         self.current_color_chosen_by_wild_card = None
     
     def start_game(self):
-        pass
+        while True:
+            for player in self.players:
+                if player.total_points >= 500:
+                    print("Game Over!\n")
+                    print(f"Player {player.name} won the game!\n")
+                    self.show_scoreboard()
+                    break
+                    
+                self.single_round()
     
     def single_round(self):
         """
@@ -51,7 +42,7 @@ class Game:
         cards_played.append(first_card)
         
         print(f"****** Round {self.round} ******\n")
-        while self.player_won(self.players) == None:
+        while True:
             for p in range(0, len(self.players), pace):
                 player = self.players[p]
                 if number_of_cards_next_player_draws is not None:
@@ -93,6 +84,7 @@ class Game:
                         print("Counting points...\n")
                         total_points_to_winner = self.count_points()
                         print(f"{player.name} got more {total_points_to_winner} points!\n")
+                        player.increase_points(total_points_to_winner)
                         self.show_scoreboard()
                             
                     if type(possible_card) == SpecialCard:
