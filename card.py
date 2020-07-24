@@ -28,9 +28,8 @@ class SpecialCard(Card):
     a different effect in the game.
     '''
     
-    def __init__(self, color, name, function):
+    def __init__(self, color, name):
         super().__init__(color, name)
-        self.effect_in_game = function
     
     def get_special_cards_name(self):
         '''
@@ -65,3 +64,4 @@ class CardType(Enum):
     DRAWTWO = "Draw two"
     SKIP = "Skip"
     REVERSE = "Reverse"
+    
