@@ -49,6 +49,9 @@ class Player:
         values together.
         """
         cards_total_points = 0
+        if self.cards == []:
+            return 0
+        
         for card in self.cards:
             cards_total_points += card.get_card_points()
         
@@ -84,5 +87,5 @@ class Player:
         if len(self.cards) == 2:
             print(f"{self.name}: Uno!")
             
-        del(self.cards(card_index))
+        del(self.cards[card_index])
         
