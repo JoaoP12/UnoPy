@@ -5,7 +5,7 @@ class Card:
     The parent class of the cards. It keeps track of the cards' names and colors.
     '''
     
-    def __init__(self, color, name):
+    def __init__(self, name, color=None):
         self.color = color
         self.name = name
 
@@ -28,7 +28,7 @@ class SpecialCard(Card):
     a different effect in the game.
     '''
     
-    def __init__(self, color, name):
+    def __init__(self, name, color=None):
         super().__init__(color, name)
     
     def get_special_cards_name(self):
@@ -64,4 +64,3 @@ class CardType(Enum):
     DRAWTWO = "Draw two"
     SKIP = "Skip"
     REVERSE = "Reverse"
-    
