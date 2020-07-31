@@ -6,7 +6,7 @@ class Player:
     This class keeps track of the players' information. Such as his/her name, cards and her/his points
     """
     
-    def __init__(self, name, cards):
+    def __init__(self, name):
         self.name = name
         self.cards = []
         self.total_points = 0
