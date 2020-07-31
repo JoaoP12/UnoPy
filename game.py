@@ -1,10 +1,10 @@
 from deck import Deck
 from player import Player
-from card import Card, NormalCard, SpecialCard, CardType, NoMoreCards
+from card import Card, NormalCard, SpecialCard, CardType
 
 class Game:
-    def __init__(self, players, gdeck):
-        self.players = players
+    def __init__(self, gdeck):
+        self.players = []
         self.number_of_players = len(self.players)
         self.gdeck = gdeck
         self.round = 0
@@ -220,7 +220,7 @@ class Game:
         """
         return pace * -1
     
-    def draw_card_to_player(self, player, cards_played):
+    def draw_card_to_player(self, player, cards_played=[]):
         '''
         Checks if there are any cards left on the deck to draw, if there aren't, it creates a new deck with
         the cards already played.
@@ -238,4 +238,9 @@ class Game:
         '''
         
         player.remove_card_played(card_to_be_taken)
-        
+    
+    def insert_player(self, name):
+        '''
+        Inserts a new player in the players variable.
+        '''
+        self.players.append(Player(name))
