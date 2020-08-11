@@ -16,7 +16,7 @@ class NormalCard(Card):
     '''
     
     def __init__(self, color, name, points):
-        super().__init__(color, name)
+        super().__init__(name, color)
         self.points = points
         
 class SpecialCard(Card):
@@ -29,7 +29,7 @@ class SpecialCard(Card):
     '''
     
     def __init__(self, name, color=None):
-        super().__init__(color, name)
+        super().__init__(name, color)
     
     def get_special_cards_name(self):
         '''

@@ -2,7 +2,7 @@ from card import Card
 from card import NormalCard
 from card import SpecialCard
 from random import randint
-import unittest
+
 
 class Deck:
     def __init__(self, cards):
@@ -65,6 +65,7 @@ class Deck:
         self.cards = played_cards
         return self.get_deck()
 
+import unittest
 
 class TestDeck(unittest.TestCase):
     def test_empty_deck(self):
