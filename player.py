@@ -1,5 +1,5 @@
 from deck import Deck
-from card import Card, NormalCard, SpecialCard as cd
+from card import Card, NormalCard, SpecialCard
 
 class Player:
     """
@@ -88,4 +88,65 @@ class Player:
             print(f"{self.name}: Uno!")
             
         del(self.cards[card_index])
+
+import unittest
+
+class TestPlayer(unittest.TestCase):
+    def setUp(self):
+        self.cards = []
+        self.player = Player("Joao")
+        self.deck = Deck(self.cards)
+        self.special_card_1 = SpecialCard('Wild Draw Four')
+        self.special_card_2 = SpecialCard('Draw Two', 'Yellow')
+        self.special_card_3 = SpecialCard('Reverse', 'Green')
+        self.normal_card_1 = NormalCard('Blue', 'One', 1)
+        self.normal_card_2 = NormalCard('Yellow', 'Six', 6)
+        self.normal_card_3 = NormalCard('Green', 'Zero', 0)
+        self.test_cards = [
+            self.special_card_1,
+            self.special_card_2,
+            self.special_card_3,
+            self.normal_card_1,
+            self.normal_card_2,
+            self.normal_card_3
+        ]
+    
+    def test_add_single_card(self):
+        self.cards.append(NormalCard('Red', 'Test', 5))
+        self.player.draw_card_to_players_deck(self.deck)
+        self.assertEqual(self.player.cards[0].name, 'Test')
+    
+    def test_add_multiple_cards(self):
+        self.cards += self.test_cards
+        
+        for i in range(6):
+            self.player.draw_card_to_players_deck(self.deck)
+        
+        self.test_cards.reverse()
+        self.assertEqual(self.player.cards, self.test_cards)
+        
+    def test_add_single_card_and_remove_it(self):
+        self.cards.append(self.normal_card_1)
+        self.player.draw_card_to_players_deck(self.deck)
+        self.assertEqual(self.player.cards, [self.normal_card_1])
+        
+        self.player.remove_card_played(self.normal_card_1)
+        self.assertEqual(self.player.cards, [])
+    
+    def test_add_multiple_cards_and_remove_one(self):
+        self.cards += self.test_cards
+        
+        for i in range(6):
+            self.player.draw_card_to_players_deck(self.deck)
+            
+        self.test_cards.reverse()
+        self.assertEqual(self.player.cards, self.test_cards)
+    
+    def test_print_cards(self):
+        self.assertEqual(self.player.print_cards(), 0)
+        
+
+if __name__ == '__main__':
+    unittest.main()
+        
         
