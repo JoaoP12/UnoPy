@@ -18,6 +18,13 @@ class NormalCard(Card):
     def __init__(self, color, name, points):
         super().__init__(name, color)
         self.points = points
+    
+    def get_card_points(self):
+        '''
+        Helper method that returns the points of the card. It was implemented to avoid the player method
+        get_card_points to be verbose.
+        '''
+        return self.points
         
 class SpecialCard(Card):
     '''
