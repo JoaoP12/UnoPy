@@ -153,6 +153,9 @@ class Game:
                 return True
             
             return False
+        
+        if possible_card == None:
+            return False
             
     def show_scoreboard(self):
         """
