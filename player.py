@@ -18,31 +18,48 @@ class Player:
         """
         self.total_points += amount
         print(f"Player {self.name} has {self.total_points} now.")
+        
+    def ask_user_choice(self):
+        '''
+        Prints the user's cards and returns the answer of the user        
+        '''
+        self.print_cards()
+        return int(input("What's the card you wanna play?\n"))
     
     def play(self):
         """
-        Calls the helper method self.print_cards() to print all the cards, then it tries to take the user
-        input and returns the card according to the index the user chose.
+        Takes the user input, then checks it and returns it if valid, if not it will return None
         """
         
-        card_index = self.print_cards()
+        user_choice = self.ask_user_choice()
+        user_choice_checked = self.check_user_choice(user_choice)
         
+        if user_choice_checked is None:
+            print("Please, digit a valid NUMBER.")
+            for i in range(3):
+                user_choice = self.ask_user_choice()
+                user_choice_checked = self.check_user_choice(user_choice)
+                if user_choice_checked is not None:
+                    return user_choice_checked
+                
+            return None
+        
+        return user_choice_checked
+    
+    def check_user_choice(self, user_choice):
+        '''
+        Checks if the user is entering a valid option, if so, returns the choice, otherwise return None
+        '''
         try:
-            user_choice = int(input("What's the card you wanna play?\n"))
-            
-            if user_choice < 0 or user_choice >= card_index:
+            if user_choice < 0 or user_choice >= len(self.cards):
                 print("Please, enter a valid number")
-                while user_choice < 0 or user_choice >= card_index:
-                    card_index = self.print_cards()
-                    user_choice = int(input("What's the card you wanna play?\n"))
-                    
+                return None
+                        
             return self.cards[user_choice]
         
-        except ValueError:
-            print("Please, digit a valid NUMBER.")
-            
-            return self.play()
-    
+        except (ValueError, IndexError):
+            return None
+        
     def get_cards_points(self):
         """
         Iterate trough the player's cards and return the total amount of points all the cards
@@ -90,14 +107,15 @@ class Player:
         del(self.cards[card_index])
 
 import unittest
+from mock import MockInputFunction
 
 class TestPlayer(unittest.TestCase):
     def setUp(self):
         self.cards = []
         self.player = Player("Joao")
         self.deck = Deck(self.cards)
-        self.special_card_1 = SpecialCard('Wild Draw Four')
-        self.special_card_2 = SpecialCard('Draw Two', 'Yellow')
+        self.special_card_1 = SpecialCard('Wild draw four')
+        self.special_card_2 = SpecialCard('Draw two', 'Yellow')
         self.special_card_3 = SpecialCard('Reverse', 'Green')
         self.normal_card_1 = NormalCard('Blue', 'One', 1)
         self.normal_card_2 = NormalCard('Yellow', 'Six', 6)
@@ -141,10 +159,56 @@ class TestPlayer(unittest.TestCase):
             
         self.test_cards.reverse()
         self.assertEqual(self.player.cards, self.test_cards)
+        
+        self.player.remove_card_played(self.special_card_2)
+        self.assertNotIn(self.special_card_2, self.cards)
+        
+    def test_remove_card_from_empty_deck(self):
+        with self.assertRaises(ValueError):
+            self.player.remove_card_played(self.normal_card_2)
+    
+    def test_get_cards_points(self):
+        self.cards += self.test_cards
+        for i in range(6):
+            self.player.draw_card_to_players_deck(self.deck)
+            
+        self.assertEqual(self.player.get_cards_points(), 97)
     
     def test_print_cards(self):
         self.assertEqual(self.player.print_cards(), 0)
+    
+    def test_increase_points(self):
+        self.assertEqual(self.player.total_points, 0)
         
+        self.player.increase_points(20)
+        self.assertEqual(self.player.total_points, 20)
+        
+
+    def test_play_method_with_valid_entries(self):
+        self.cards += self.test_cards
+        
+        for i in range(6):
+            self.player.draw_card_to_players_deck(self.deck)
+        
+        self.test_cards.reverse()
+        for i in range(6):
+            with MockInputFunction(str(i)):
+                self.assertEqual(self.player.play(), self.test_cards[i])
+          
+    def test_play_method_with_invalid_entries(self):
+        self.cards += self.test_cards
+        
+        for card in self.cards:
+            self.player.draw_card_to_players_deck(self.deck)
+            
+        with MockInputFunction('7'):
+            self.assertEqual(self.player.play(), None)
+        
+        with MockInputFunction('159'):
+            self.assertEqual(self.player.play(), None)
+        
+        with MockInputFunction(f'{10 ** 13}'):
+            self.assertEqual(self.player.play(), None)
 
 if __name__ == '__main__':
     unittest.main()
