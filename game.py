@@ -1,4 +1,4 @@
-from deck import Deck
+from deck import Deck, NoMoreCards
 from player import Player
 from card import Card, NormalCard, SpecialCard, CardType
 
@@ -9,27 +9,22 @@ class Game:
         self.gdeck = gdeck
         self.round = 0
         self.current_color_chosen_by_wild_card = None
+        self.cards_played = []
+        self.pace = 1
+        self.skip_player = False
     
     def start_game(self):
         while True:
-            for player in self.players:
-                if player.total_points >= 500:
-                    print("Game Over!\n")
-                    print(f"Player {player.name} won the game!\n")
-                    self.show_scoreboard()
-                    break
+            if self.player_won_game():
+                break
                     
-                self.single_round()
+            self.single_round()
     
     def single_round(self):
         """
         This method "plays" a single round of the game calling the necessary methods and classes
         and print messages so the players know what is happening.
         """
-        skip_player = False
-        number_of_cards_next_player_draws = None #  This variable stores how many cards does the 'next' player needs to draw
-        cards_played = []
-        pace = 1
         self.round += 1
         
         print("Starting round...")
@@ -39,83 +34,45 @@ class Game:
         
         first_card = self.gdeck.draw_card()
         print("The first card is --> {first_card.name} -- {first_card.color}")
-        cards_played.append(first_card)
+        self.cards_played.append(first_card)
         
         print(f"****** Round {self.round} ******\n")
         while True:
-            for p in range(0, len(self.players), pace):
-                player = self.players[p]
-                if number_of_cards_next_player_draws is not None:
-                    print(f"Player {player.name} needs to draw {number_of_cards_next_player_draws} cards due to the last card played!\n")
-                    print(f"Drawing cards to {player.name}'s deck...\n")
+            
+            for player in range(0, len(self.players), self.pace):
+                if not self.player_won_round():
+                    current_player = self.players[player]
                     
-                    for time in range(0, number_of_cards_next_player_draws):
-                        self.draw_card_to_player(player, cards_played)
-                            
-                    skip_player = True
-                
-                if skip_player:
-                    print(f"{player.name} skipped!\n")
-                    skip_player = False
-                    continue
-                
-                print(f"{player.name}'s turn!")
-                
-                if self.has_valid_cards(player.cards, cards_played) == False:
-                    print(f"It seems the player {player.name} doesn't have a playable card...\n")
-                    print(f"Drawing a card to {player.name}'s deck...\n")
-                    
-                    self.draw_card_to_player(player, cards_played)
-                    
-                    if self.has_valid_cards(player.cards, cards_played) == False:
-                        print(f"{player.name} still does not have a playable card!\n")
+                    if self.skip_player:
                         print(f"{player.name} skipped!\n")
+                        self.skip_player = False
                         continue
+                
+                    print(f"{current_player.name}'s turn!")
+                
+                    if self.check_players_cards(current_player):
                     
-                possible_card = player.play()
+                        possible_card = player.play()
                     
-                if self.valid_play(possible_card, cards_played):
-                    print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
+                        if type(possible_card) == NormalCard:
+                            if self.valid_play(possible_card):
+                                print(f"Player {current_player.name} played a {possible_card.color} {possible_card.name} card!")
                         
-                    self.remove_card_from_player(player, possible_card)
-                        
-                    if self.player_won(player):
-                        print(f"{player.name} won the round!\n")
-                        print("Counting points...\n")
-                        total_points_to_winner = self.count_points()
-                        print(f"{player.name} got more {total_points_to_winner} points!\n")
-                        player.increase_points(total_points_to_winner)
-                        self.show_scoreboard()
-                            
-                    if type(possible_card) == SpecialCard:
-                        
-                        card_type = CardType(possible_card.name)
-                            
-                        if card_type == CardType.WILD:
-                            self.current_color_chosen_by_wild_card = self.ask_color()
-                            print(f"Now the color of the round is {self.current_color_chosen_by_wild_card}")
-                                
-                        elif card_type == CardType.WILDFOUR:
-                            self.current_color_chosen_by_wild_card = self.ask_color()
-                            number_of_cards_next_player_draws = 4
-                            
-                        elif card_type == CardType.DRAWTWO:
-                            number_of_cards_next_player_draws = 2
-                            
-                        elif card_type == CardType.SKIP:
-                            skip_player = True
-                            
-                        elif card_type == CardType.REVERSE:
-                            pace = self.revert_game(pace)
-                            
+                            else:
+                                while True:
+                                    possible_card = player.play()
+                                    if type(possible_card) == NormalCard and self.valid_play(possible_card):
+                                        break
+                                    elif type(possible_card) == SpecialCard:
+                                        self.check_special_card(current_player, possible_card, player+1)
+                                        break
+                    
                         else:
-                            print("Game: That's not a valid card! Try again!")
-                            while self.valid_play(possible_card, cards_played) == False:
-                                possible_card = player.play()
-                            
-                            print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
-                            
-                        cards_played.append(possible_card)
+                            self.check_special_card(current_player, possible_card, player+1)
+                        
+                        self.remove_card_from_player(current_player, possible_card)
+                        self.cards_played.append(possible_card)
+                
     
     def count_points(self):
         """
@@ -128,14 +85,14 @@ class Game:
         
         return total_points
     
-    def valid_play(self, possible_card, cards_played):
+    def valid_play(self, possible_card):
         """
         Checks if the card the player is trying to play is a valid play. It does that by checking
         the last card played in the game and checks if both the card that wants to enter the game
         and the card already played are compatible between them.
         """
         
-        last_card_played = cards_played[-1]
+        last_card_played = self.cards_played[-1]
         
         if type(possible_card) == NormalCard and type(last_card_played) == NormalCard:
             if possible_card.color == last_card_played.color or possible_card.number == last_card_played.number:
@@ -165,15 +122,34 @@ class Game:
         for player in self.players:
             print(f"{player.name}: {player.get_total_score} pts\n")
         
-    def player_won(self, player):
+    def player_won_round(self):
         '''
-        Checks the cards of the player, if it is == 0, then the player won and True is returned, otherwise
+        Checks the cards of the player, if it is None, then the player won and True is returned, otherwise
         False is returned..
         '''
-        if player.cards == []:
-            return True
+        for player in self.players:
+            if player.cards is None:
+                print(f"{player.name} won the round!\n")
+                print("Counting points...\n")
+                total_points = self.count_points()
+                print(f"Total points --> {total_points}")
+                player.increase_points(total_points)
+                self.show_scoreboard()
+                return True
         return False
-        
+    
+    def player_won_game(self):
+        '''
+        Iterate trough the self.players list and check each player's points, if any player has reached
+        500 points, it returns True, otherwise returns False
+        '''
+        for player in self.players:
+            if player.total_points >= 500:
+                print("Game Over!\n")
+                print(f"Player {player.name} won the game!\n")
+                self.show_scoreboard()
+                return True
+        return False
     
     def ask_color():
         """
@@ -205,25 +181,25 @@ class Game:
             else:
                 return colors_list[color-1]
         
-    def has_valid_cards(self, players_cards, cards_played):
+    def has_valid_cards(self, players_cards):
         """
         Iterate trough the player's cards and return True if the player has at least one playable card.
         Otherwise return False.
         """
         for card in players_cards:
-            if self.valid_play(card, cards_played):
+            if self.valid_play(card):
                 return True
         
         return False
         
     def revert_game(self, pace):
         """
-        Takes the pace (that determines the order the players) and returns it times -1, that will literally
+        Takes the pace (that determines the order the players) and multiply it by -1, that will literally
         revert the game.
         """
-        return pace * -1
+        self.pace += -1
     
-    def draw_card_to_player(self, player, cards_played=[]):
+    def draw_card_to_player(self, player):
         '''
         Checks if there are any cards left on the deck to draw, if there aren't, it creates a new deck with
         the cards already played.
@@ -232,7 +208,8 @@ class Game:
             player.draw_card_to_players_deck(self.gdeck)
                             
         except NoMoreCards:
-            self.gdeck = self.gdeck.create_new_deck_with_played_cards(cards_played)
+            self.gdeck = self.gdeck.create_new_deck_with_played_cards(self.cards_played)
+            self.cards_played = []
             player.draw_card_to_players_deck(self.gdeck)
     
     def remove_card_from_player(self, player, card_to_be_taken):
@@ -247,3 +224,71 @@ class Game:
         Inserts a new player in the players variable.
         '''
         self.players.append(Player(name))
+    
+    def check_players_cards(self, player):
+        '''
+        Check if the player has valid cards and if not, draw a card to his/her deck. Return True or False accor
+        ding to the results of the check.
+        If player has valid cards --> return True
+        If not --> draw card to player --> if player has valid cards --> return True (otherwise) return False
+        '''
+        if not self.has_valid_cards(player.cards):
+            print(f"It seems the player {player.name} doesn't have a playable card...\n")
+            print(f"Drawing card to {player.name}'s deck...\n")
+                    
+            self.draw_card_to_player(player)
+                    
+            if not self.has_valid_cards(player.cards):
+                print(f"{player.name} still does not have a playable card!\n")
+                print("{player.name} skipped!")
+                return False
+            return True
+        
+        return True
+    
+    def skip_player(self, player_to_be_skipped):
+        '''
+        Helper method that ste the variable self.skip_player to True, then when the method single_round checks
+        if it is needed to skip the current player, it will be done.
+        '''
+        self.skip_player = True
+    
+    
+    def check_special_card(self, player, possible_card, next_players_index):
+        '''
+        Checks if the card played is a Special Card and if so, execute what would be its effects in the game,
+        like reverting, changing de color etc.
+        '''
+        if type(possible_card) == SpecialCard:
+                        
+            card_type = CardType(possible_card.name)
+                            
+            if card_type == CardType.WILD:
+                self.current_color_chosen_by_wild_card = self.ask_color()
+                print(f"Now the color of the round is {self.current_color_chosen_by_wild_card}")
+                                
+            elif card_type == CardType.WILDFOUR:
+                self.current_color_chosen_by_wild_card = self.ask_color()
+            
+                for time in range(4):
+                    self.draw_card_to_player(self.players[next_players_index])
+                self.skip_player(next_players_index)
+                            
+            elif card_type == CardType.DRAWTWO:
+                for time in range(2):
+                    self.draw_card_to_player(self.players[next_players_index])
+                self.skip_player(next_players_index)
+                
+                            
+            elif card_type == CardType.SKIP:
+                self.skip_player(next_players_index)
+                            
+            elif card_type == CardType.REVERSE:
+                self.revert_game()
+                            
+            else:
+                print("Game: That's not a valid card! Try again!")
+                while not self.valid_play(possible_card):
+                    possible_card = player.play()
+                            
+                print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
