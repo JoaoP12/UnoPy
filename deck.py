@@ -8,14 +8,6 @@ class Deck:
     def __init__(self, cards):
         self.cards = cards
         
-    
-    def get_deck(self):
-        """
-        Returns the deck 'updated', after shuffling it.
-        """
-        self.shuffle_deck()
-        return self.cards
-        
     def draw_card(self):
         """
         Returns the top card of the deck to the player's cards.
