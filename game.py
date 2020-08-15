@@ -6,7 +6,8 @@ class Game:
     def __init__(self, gdeck):
         self.players = []
         self.number_of_players = len(self.players)
-        self.gdeck = gdeck
+        self.gdeck = Deck(gdeck)
+        self.gdeck.shuffle_deck()
         self.round = 0
         self.current_color_chosen_by_wild_card = None
         self.cards_played = []
@@ -33,7 +34,7 @@ class Game:
         print("Drawing a card to be the first...\n")
         
         first_card = self.gdeck.draw_card()
-        print("The first card is --> {first_card.name} -- {first_card.color}")
+        print(f"The first card is --> {first_card.name} -- {first_card.color}")
         self.cards_played.append(first_card)
         
         print(f"****** Round {self.round} ******\n")
@@ -52,7 +53,7 @@ class Game:
                 
                     if self.check_players_cards(current_player):
                     
-                        possible_card = player.play()
+                        possible_card = current_player.play()
                     
                         if type(possible_card) == NormalCard:
                             if self.valid_play(possible_card):
@@ -60,7 +61,7 @@ class Game:
                         
                             else:
                                 while True:
-                                    possible_card = player.play()
+                                    possible_card = current_player.play()
                                     if type(possible_card) == NormalCard and self.valid_play(possible_card):
                                         break
                                     elif type(possible_card) == SpecialCard:
@@ -120,7 +121,7 @@ class Game:
         """
         print("====== Scoreboard ======\n")
         for player in self.players:
-            print(f"{player.name}: {player.get_total_score} pts\n")
+            print(f"{player.name}: {player.total_points} pts\n")
         
     def player_won_round(self):
         '''
@@ -292,3 +293,10 @@ class Game:
                     possible_card = player.play()
                             
                 print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
+
+import unittest
+
+class TestGame(unittest.TestCase):
+    def setUp(self):
+        pass
+    
