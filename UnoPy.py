@@ -1,27 +1,29 @@
 from game import Game
 from generate_cards import GenerateCards
 
+deck = GenerateCards().get_cards()
+game_session = Game(deck)
+
 def menu():
     print("Welcome to UnoPy!\n")
     try:
-        number_of_players = 0
-        while number_of_players < 2 and number_of_players > 10:
+        number_of_players = int(input("How many players will play today?\n Min: 2 players - Max: 10 players\n"))
+        while number_of_players < 2 or number_of_players > 10:
             number_of_players = int(input("How many players will play today?\n Min: 2 players - Max: 10 players\n"))
             
     except ValueError:
         while True:
-            try:
-                number_of_players = 0
+            try: 
                 print("Please type a valid number!")
-                while number_of_players < 2 and number_of_players > 10:
+                while number_of_players < 2 or number_of_players > 10:
                     number_of_players = int(input("How many players will play today?\n Min: 2 players - Max: 10 players\n"))
                     
                 break
             
             except ValueError:
-                continue
+                pass
             
-    return ask_players_names(number_of_players)
+    ask_players_names(number_of_players)
 
 def ask_players_names(number_of_players):
     print("Now type all the players names...")
@@ -33,13 +35,11 @@ def ask_players_names(number_of_players):
     print("Players:\n")
     print(players_string)
     
-    
 def distribute_cards(players):
     for player in players:
         for card_drown in range(7):
             game_session.draw_card_to_player(player)
     
-
 def main():
     menu()
     print("Distributing cards...\n")
@@ -47,8 +47,5 @@ def main():
     print("Done!\n")
     print("Game Starting...\n")
     game_session.start_game()
-    
 
-deck = GenerateCards().get_cards()
-game_session = Game(deck)
 main()
