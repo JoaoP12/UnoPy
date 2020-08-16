@@ -9,7 +9,7 @@ class Game:
         self.gdeck = Deck(gdeck)
         self.gdeck.shuffle_deck()
         self.round = 0
-        self.current_color_chosen_by_wild_card = None
+        self.current_round_color = None
         self.cards_played = []
         self.pace = 1
         self.skip_player = False
@@ -33,9 +33,10 @@ class Game:
         self.show_scoreboard()
         print("Drawing a card to be the first...\n")
         
-        first_card = self.gdeck.draw_card()
+        first_card = self.draw_first_card()
         print(f"The first card is --> {first_card.name} -- {first_card.color}")
         self.cards_played.append(first_card)
+        self.current_round_color = first_card.color
         
         print(f"****** Round {self.round} ******\n")
         while True:
@@ -74,6 +75,13 @@ class Game:
                         self.remove_card_from_player(current_player, possible_card)
                         self.cards_played.append(possible_card)
                 
+    def draw_first_card(self):
+        """
+        Iterate trough the deck and return the first NormalCard to start the game
+        """
+        for card in self.cards:
+            if type(card) == NormalCard:
+                return self.cards.pop(self.cards.index(card))
     
     def count_points(self):
         """
@@ -96,7 +104,7 @@ class Game:
         last_card_played = self.cards_played[-1]
         
         if type(possible_card) == NormalCard and type(last_card_played) == NormalCard:
-            if possible_card.color == last_card_played.color or possible_card.number == last_card_played.number:
+            if possible_card.color == last_card_played.color or possible_card.points == last_card_played.points:
                 return True
             
             return False
@@ -106,9 +114,10 @@ class Game:
             return True
         
         elif last_card_played.name == "Wild" or last_card_played.name == "Wild draw four":
+            return True
             
-            if possible_card.color == self.current_color_chosen_by_wild_card:
-                return True
+        if possible_card.color == self.current_round_color:
+            return True
             
             return False
         
@@ -220,11 +229,11 @@ class Game:
         
         player.remove_card_played(card_to_be_taken)
     
-    def insert_player(self, name):
+    def insert_player(self, player):
         '''
         Inserts a new player in the players variable.
         '''
-        self.players.append(Player(name))
+        self.players.append(player)
     
     def check_players_cards(self, player):
         '''
@@ -265,11 +274,11 @@ class Game:
             card_type = CardType(possible_card.name)
                             
             if card_type == CardType.WILD:
-                self.current_color_chosen_by_wild_card = self.ask_color()
-                print(f"Now the color of the round is {self.current_color_chosen_by_wild_card}")
+                self.current_round_color = self.ask_color()
+                print(f"Now the color of the round is {self.current_round_color}")
                                 
             elif card_type == CardType.WILDFOUR:
-                self.current_color_chosen_by_wild_card = self.ask_color()
+                self.current_round-color = self.ask_color()
             
                 for time in range(4):
                     self.draw_card_to_player(self.players[next_players_index])
@@ -295,8 +304,38 @@ class Game:
                 print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")
 
 import unittest
-
+from generate_cards import GenerateCards
 class TestGame(unittest.TestCase):
     def setUp(self):
-        pass
+        self.player_example = Player("John")
+        self.game_example = Game(GenerateCards().get_cards())
+        self.special_card_1 = SpecialCard('Wild draw four')
+        self.special_card_2 = SpecialCard('Draw two', 'Yellow')
+        self.special_card_3 = SpecialCard('Reverse', 'Green')
+        self.normal_card_1 = NormalCard('Blue', 'One', 1)
+        self.normal_card_2 = NormalCard('Yellow', 'Six', 6)
+        self.normal_card_3 = NormalCard('Green', 'Zero', 0)
+        self.test_cards = [
+            self.special_card_1,
+            self.special_card_2,
+            self.special_card_3,
+            self.normal_card_1,
+            self.normal_card_2,
+            self.normal_card_3
+        ]
+        
+    
+    def test_insert_player(self):
+        self.game_example.insert_player(self.player_example)
+        self.assertIn(self.player_example, self.game_example.players)
+    
+    def test_valid_play(self):
+        self.game_example.cards_played += self.test_cards[:4]
+        self.assertFalse(self.game_example.valid_play(self.normal_card_3))
+        self.game_example.cards_played = self.test_cards[1:]
+        self.assertTrue(self.game_example.valid_play(self.special_card_1))
+        
+        
+if __name__ == "__main__":
+    unittest.main()
     
