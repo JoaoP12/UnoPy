@@ -1,6 +1,6 @@
 from game import Game
 from generate_cards import GenerateCards
-
+from player import Player
 deck = GenerateCards().get_cards()
 game_session = Game(deck)
 
@@ -31,7 +31,7 @@ def ask_players_names(number_of_players):
     for player in range(0, number_of_players):
         current_player_name = input(f"\nPlayer {player} name --> ")
         players_string += current_player_name + "\n"
-        game_session.insert_player(current_player_name)
+        game_session.insert_player(Player(current_player_name))
     print("Players:\n")
     print(players_string)
     
