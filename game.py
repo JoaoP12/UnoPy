@@ -104,25 +104,17 @@ class Game:
         last_card_played = self.cards_played[-1]
         
         if type(possible_card) == NormalCard and type(last_card_played) == NormalCard:
-            if possible_card.color == last_card_played.color or possible_card.points == last_card_played.points:
+            if possible_card.color == self.current_round_color or possible_card.points == last_card_played.points:
                 return True
             
-            return False
-        
-        elif type(last_card_played) == SpecialCard and type(possible_card) == SpecialCard and last_card_played.name == possible_card.name:
+        elif type(last_card_played) == SpecialCard and type(possible_card) == SpecialCard:
+            if last_card_played.name == possible_card.name:
+                return True
             
-            return True
-        
-        elif last_card_played.name == "Wild" or last_card_played.name == "Wild draw four":
+        elif "Wild" in possible_card.name:
             return True
             
-        if possible_card.color == self.current_round_color:
-            return True
-            
-            return False
-        
-        if possible_card == None:
-            return False
+        return False
             
     def show_scoreboard(self):
         """
@@ -161,7 +153,7 @@ class Game:
                 return True
         return False
     
-    def ask_color():
+    def ask_color(self):
         """
         Takes the input of the player that played a Wild card, in the input he/shee needs to
         choose the color they want to impose in the game.
@@ -170,16 +162,16 @@ class Game:
         colors_list = ['Blue', 'Green', 'Red', 'Yellow']
         print("Choose a color:\n")
         
-        while True:
+        for i in range(3):
             try:
-                color = int(input("1 - Blue\n2 - Green\n3 - Red\n4 - Yellow\n"))
+                color = int(input("1. Blue\n2. Green\n3. Red\n4. Yellow\n"))
                 
             except ValueError:
                 while True:
                     
                     try:
                         print("Please, type a valid option.\n")
-                        color = int(input("1 - Blue\n2 - Green\n3 - Red\n4 - Yellow\n"))
+                        color = int(input("1. Blue\n2. Green\n3. Red\n4. Yellow\n"))
                         break
                     
                     except ValueError:
@@ -189,7 +181,11 @@ class Game:
                 continue
             
             else:
-                return colors_list[color-1]
+                self.current_round_color = colors_list[color-1]
+                break
+        else:
+            print("You lost your turn because of many invalid entries")
+            self.skip_player_turn()
         
     def has_valid_cards(self, players_cards):
         """
@@ -256,7 +252,7 @@ class Game:
         
         return True
     
-    def skip_player(self, player_to_be_skipped):
+    def skip_player_turn(self):
         '''
         Helper method that ste the variable self.skip_player to True, then when the method single_round checks
         if it is needed to skip the current player, it will be done.
@@ -274,11 +270,11 @@ class Game:
             card_type = CardType(possible_card.name)
                             
             if card_type == CardType.WILD:
-                self.current_round_color = self.ask_color()
+                self.ask_color()
                 print(f"Now the color of the round is {self.current_round_color}")
                                 
             elif card_type == CardType.WILDFOUR:
-                self.current_round-color = self.ask_color()
+                self.ask_color()
             
                 for time in range(4):
                     self.draw_card_to_player(self.players[next_players_index])
@@ -291,7 +287,7 @@ class Game:
                 
                             
             elif card_type == CardType.SKIP:
-                self.skip_player(next_players_index)
+                self.skip_player_turn()
                             
             elif card_type == CardType.REVERSE:
                 self.revert_game()
@@ -305,9 +301,12 @@ class Game:
 
 import unittest
 from generate_cards import GenerateCards
+from mock import MockInputFunction
+
 class TestGame(unittest.TestCase):
     def setUp(self):
-        self.player_example = Player("John")
+        self.player_1 = Player("John")
+        self.player_2 = Player("Jaroslaw")
         self.game_example = Game(GenerateCards().get_cards())
         self.special_card_1 = SpecialCard('Wild draw four')
         self.special_card_2 = SpecialCard('Draw two', 'Yellow')
@@ -326,15 +325,39 @@ class TestGame(unittest.TestCase):
         
     
     def test_insert_player(self):
-        self.game_example.insert_player(self.player_example)
-        self.assertIn(self.player_example, self.game_example.players)
+        self.game_example.insert_player(self.player_1)
+        self.assertIn(self.player_1, self.game_example.players)
     
     def test_valid_play(self):
         self.game_example.cards_played += self.test_cards[:4]
         self.assertFalse(self.game_example.valid_play(self.normal_card_3))
         self.game_example.cards_played = self.test_cards[1:]
         self.assertTrue(self.game_example.valid_play(self.special_card_1))
-        
+    
+    def test_ask_color_with_valid_entries(self):
+        with MockInputFunction('4'):
+            self.game_example.ask_color()
+            self.assertEqual(self.game_example.current_round_color, 'Yellow')
+        with MockInputFunction('1'):
+            self.game_example.ask_color()
+            self.assertEqual(self.game_example.current_round_color, 'Blue')
+    
+    def test_ask_color_with_invalid_entries(self):
+        with MockInputFunction('5'):
+            self.game_example.ask_color()
+            self.assertIsNone(self.game_example.current_round_color)
+            self.assertTrue(self.game_example.skip_player)
+        with MockInputFunction('0'):
+            self.game_example.ask_color()
+            self.assertIsNone(self.game_example.current_round_color)
+            self.assertTrue(self.game_example.skip_player)
+    
+'''
+    def test_check_special_card(self):
+        #Implementar depois do ask_color
+        self.game_example.players += [self.player_1, self.player_2]
+        # Testing 
+'''   
         
 if __name__ == "__main__":
     unittest.main()
