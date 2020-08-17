@@ -198,12 +198,12 @@ class Game:
         
         return False
         
-    def revert_game(self, pace):
+    def revert_game(self):
         """
         Takes the pace (that determines the order the players) and multiply it by -1, that will literally
         revert the game.
         """
-        self.pace += -1
+        self.pace *= -1
     
     def draw_card_to_player(self, player):
         '''
@@ -258,8 +258,7 @@ class Game:
         if it is needed to skip the current player, it will be done.
         '''
         self.skip_player = True
-    
-    
+
     def check_special_card(self, player, possible_card, next_players_index):
         '''
         Checks if the card played is a Special Card and if so, execute what would be its effects in the game,
@@ -277,14 +276,22 @@ class Game:
                 self.ask_color()
             
                 for time in range(4):
-                    self.draw_card_to_player(self.players[next_players_index])
-                self.skip_player(next_players_index)
+                    try:
+                        self.draw_card_to_player(self.players[next_players_index])
+                    except IndexError:
+                        next_player_index = 0
+                        self.draw_card_to_player(self.players[next_player_index])
+                        
+                self.skip_player_turn()
                             
             elif card_type == CardType.DRAWTWO:
                 for time in range(2):
-                    self.draw_card_to_player(self.players[next_players_index])
-                self.skip_player(next_players_index)
-                
+                    try:
+                        self.draw_card_to_player(self.players[next_players_index])
+                    except IndexError:
+                        next_player_index = 0
+                        self.draw_card_to_player(self.players[next_player_index])
+                self.skip_player_turn()
                             
             elif card_type == CardType.SKIP:
                 self.skip_player_turn()
@@ -352,12 +359,45 @@ class TestGame(unittest.TestCase):
             self.assertIsNone(self.game_example.current_round_color)
             self.assertTrue(self.game_example.skip_player)
     
-'''
-    def test_check_special_card(self):
-        #Implementar depois do ask_color
-        self.game_example.players += [self.player_1, self.player_2]
-        # Testing 
-'''   
+    def insert_players_on_the_game(self):
+        self.game_example.insert_player(self.player_1)
+        self.game_example.insert_player(self.player_2)
+        
+    def test_check_special_card_wild_and_wild_draw_four_cards(self):
+        self.insert_players_on_the_game()
+        
+        with MockInputFunction('1'):
+            # Wild
+            self.game_example.check_special_card(self.player_1, SpecialCard("Wild"), 1)
+            self.assertEqual(self.game_example.current_round_color, 'Blue')
+            # Wild +4
+            self.game_example.check_special_card(self.player_2, self.special_card_1, 2) 
+            '''The next player index = '2' above was put ON PURPOSE to test if the method is recognizing
+            that the player on Index 2 does not exist and assign cards to the player at Index 0, in this case
+            the player_1
+            '''
+            self.assertEqual(self.game_example.current_round_color, 'Blue')
+            self.assertEqual(len(self.player_1.cards), 4)
+    
+    def test_check_special_card_draw_two_card(self):
+        self.insert_players_on_the_game()
+        self.game_example.check_special_card(self.player_1, self.special_card_2, 1)
+        self.assertEqual(len(self.player_2.cards), 2)
+        
+        self.game_example.check_special_card(self.player_2, self.special_card_2, 2)
+        self.assertEqual(len(self.player_1.cards), 2)
+    
+    def test_check_special_card_reverse_card(self):
+        self.insert_players_on_the_game()
+        self.game_example.check_special_card(self.player_1, self.special_card_3, 1)
+        self.assertEqual(self.game_example.pace, -1)
+        self.game_example.check_special_card(self.player_2, self.special_card_3, 0)
+        self.assertEqual(self.game_example.pace, 1)
+    
+    def test_check_special_card_skip_card(self):
+        self.insert_players_on_the_game()
+        self.game_example.check_special_card(self.player_1, SpecialCard('Skip'), 1)
+        self.assertTrue(self.game_example.skip_player)
         
 if __name__ == "__main__":
     unittest.main()
