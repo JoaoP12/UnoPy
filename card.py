@@ -44,11 +44,11 @@ class SpecialCard(Card):
         the points according to each one.
         '''
         names = {
-            'Reverse': 20,
-            'Skip': 20,
-            'Draw two': 20,
-            'Wild': 50,
-            'Wild draw four': 50
+            CardType.REVERSE: 20,
+            CardType.SKIP: 20,
+            CardType.DRAWTWO: 20,
+            CardType.WILD: 50,
+            CardType.WILDFOUR: 50
         }
         return names
     
@@ -61,9 +61,7 @@ class SpecialCard(Card):
         '''
         special_cards_name = self.get_special_cards_name()
         
-        for name in special_cards_name.keys():
-            if name == self.name:
-                return special_cards_name[name]
+        return special_cards_name[self.name]
     
 class CardType(Enum):
     WILD = "Wild"
