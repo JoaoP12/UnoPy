@@ -1,5 +1,5 @@
-from deck import Deck
-from card import Card, NormalCard, SpecialCard
+from deck import _Deck
+from card import Card, NormalCard, SpecialCard, CardType
 
 class Player:
     """
@@ -74,12 +74,11 @@ class Player:
         
         return cards_total_points
     
-    def draw_card_to_players_deck(self, current_deck):
+    def draw_card_to_players_deck(self, card):
         """
-        Adds a card to the player's card calling the method from the Deck class draw_card()
-        and prints the card the player got.
+        Adds a card to the player's cards
         """
-        self.cards.append(current_deck.draw_card())
+        self.cards.append(card)
         print(f"The card you got is \n {self.cards[-1].name} -- {self.cards[-1].color}")
     
     def print_cards(self):
@@ -113,10 +112,10 @@ class TestPlayer(unittest.TestCase):
     def setUp(self):
         self.cards = []
         self.player = Player("Joao")
-        self.deck = Deck(self.cards)
-        self.special_card_1 = SpecialCard('Wild draw four')
-        self.special_card_2 = SpecialCard('Draw two', 'Yellow')
-        self.special_card_3 = SpecialCard('Reverse', 'Green')
+        self.deck = _Deck(self.cards)
+        self.special_card_1 = SpecialCard(CardType.WILDFOUR)
+        self.special_card_2 = SpecialCard(CardType.DRAWTWO, 'Yellow')
+        self.special_card_3 = SpecialCard(CardType.REVERSE, 'Green')
         self.normal_card_1 = NormalCard('Blue', 'One', 1)
         self.normal_card_2 = NormalCard('Yellow', 'Six', 6)
         self.normal_card_3 = NormalCard('Green', 'Zero', 0)
@@ -130,7 +129,8 @@ class TestPlayer(unittest.TestCase):
         ]
     
     def test_add_single_card(self):
-        self.cards.append(NormalCard('Red', 'Test', 5))
+        test_card = NormalCard('Red', 'Test', 5)
+        self.cards.append(test_card)
         self.player.draw_card_to_players_deck(self.deck)
         self.assertEqual(self.player.cards[0].name, 'Test')
     
