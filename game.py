@@ -1,13 +1,13 @@
-from deck import Deck, NoMoreCards
+from deck import _Deck, NoMoreCardsError
 from player import Player
 from card import Card, NormalCard, SpecialCard, CardType
 
 class Game:
-    def __init__(self, gdeck):
+    def __init__(self, cards):
         self.players = []
         self.number_of_players = len(self.players)
-        self.gdeck = Deck(gdeck)
-        self.gdeck.shuffle_deck()
+        self.deck = _Deck(cards)
+        self.deck.shuffle_deck()
         self.round = 0
         self.current_round_color = None
         self.cards_played = []
@@ -79,9 +79,9 @@ class Game:
         """
         Iterate trough the deck and return the first NormalCard to start the game
         """
-        for card in self.cards:
+        for card in self.deck.cards:
             if type(card) == NormalCard:
-                return self.cards.pop(self.cards.index(card))
+                return self.deck.cards.pop(self.deck.cards.index(card))
     
     def count_points(self):
         """
@@ -111,7 +111,7 @@ class Game:
             if last_card_played.name == possible_card.name:
                 return True
             
-        elif "Wild" in possible_card.name:
+        elif possible_card.name in [CardType.WILD, CardType.WILDFOUR]:
             return True
             
         return False
@@ -211,12 +211,17 @@ class Game:
         the cards already played.
         '''
         try:
-            player.draw_card_to_players_deck(self.gdeck)
+            card_to_draw = self.deck.draw_card()
+            player.draw_card_to_players_deck(card_to_draw)
                             
-        except NoMoreCards:
-            self.gdeck = self.gdeck.create_new_deck_with_played_cards(self.cards_played)
+        except NoMoreCardsError:
+            if len(self.cards_played) == 1:
+                self.skip_player = True
+                
+            self.deck = self.deck.create_new_deck_with_played_cards(self.cards_played)
             self.cards_played = []
-            player.draw_card_to_players_deck(self.gdeck)
+            card_to_draw = self.deck.draw_card()
+            player.draw_card_to_players_deck(card_to_draw)
     
     def remove_card_from_player(self, player, card_to_be_taken):
         '''
@@ -243,12 +248,13 @@ class Game:
             print(f"Drawing card to {player.name}'s deck...\n")
                     
             self.draw_card_to_player(player)
+            if self.skip_player:
+                return False
                     
             if not self.has_valid_cards(player.cards):
                 print(f"{player.name} still does not have a playable card!\n")
                 print("{player.name} skipped!")
                 return False
-            return True
         
         return True
     
@@ -314,10 +320,11 @@ class TestGame(unittest.TestCase):
     def setUp(self):
         self.player_1 = Player("John")
         self.player_2 = Player("Jaroslaw")
-        self.game_example = Game(GenerateCards().get_cards())
-        self.special_card_1 = SpecialCard('Wild draw four')
-        self.special_card_2 = SpecialCard('Draw two', 'Yellow')
-        self.special_card_3 = SpecialCard('Reverse', 'Green')
+        self.cards = GenerateCards().get_cards()
+        self.game_example = Game(self.cards)
+        self.special_card_1 = SpecialCard(CardType.WILDFOUR)
+        self.special_card_2 = SpecialCard(CardType.DRAWTWO, 'Yellow')
+        self.special_card_3 = SpecialCard(CardType.REVERSE, 'Green')
         self.normal_card_1 = NormalCard('Blue', 'One', 1)
         self.normal_card_2 = NormalCard('Yellow', 'Six', 6)
         self.normal_card_3 = NormalCard('Green', 'Zero', 0)
@@ -365,7 +372,6 @@ class TestGame(unittest.TestCase):
         
     def test_check_special_card_wild_and_wild_draw_four_cards(self):
         self.insert_players_on_the_game()
-        
         with MockInputFunction('1'):
             # Wild
             self.game_example.check_special_card(self.player_1, SpecialCard("Wild"), 1)
@@ -398,6 +404,26 @@ class TestGame(unittest.TestCase):
         self.insert_players_on_the_game()
         self.game_example.check_special_card(self.player_1, SpecialCard('Skip'), 1)
         self.assertTrue(self.game_example.skip_player)
+    
+    def test_check_players_cards(self):
+        self.game_example.deck = _Deck([self.special_card_1])
+        self.game_example.cards_played.append(self.normal_card_1)
+        self.game_example.draw_card_to_player(self.player_1)
+        self.assertTrue(self.game_example.check_players_cards(self.player_1))
+        
+        self.game_example.cards_played = []
+        
+        self.game_example.deck = _Deck([self.normal_card_2])
+        self.game_example.cards_played.append(self.normal_card_1)
+        
+        self.game_example.draw_card_to_player(self.player_2)
+        self.assertFalse(self.game_example.check_players_cards(self.player_2))
+        
+        '''
+        There's a tricky thing here.
+        When we call check_players_cards, it checks if the player has valid cards, if not, then it draws a 
+        card to him/her. HOWEVER, after it checks again if the player has valid cards
+        '''
         
 if __name__ == "__main__":
     unittest.main()
