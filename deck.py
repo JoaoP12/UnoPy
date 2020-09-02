@@ -1,10 +1,10 @@
 from card import Card
 from card import NormalCard
 from card import SpecialCard
-from random import randint
+from random import shuffle
 
 
-class Deck:
+class _Deck:
     def __init__(self, cards):
         self.cards = cards
         
@@ -15,28 +15,16 @@ class Deck:
         If the deck has no more cards, it raises the exception NoMoreCards.
         """
         if self.is_empty():
-            raise NoMoreCards
+            raise NoMoreCardsError
             
         else:
             return self.cards.pop(-1)
         
     def shuffle_deck(self):
         """
-        Takes the self.cards list and shuffle using randint function.
+        Takes the self.cards list and shuffle using shuffle function.
         """
-        amount_of_cards_available = len(self.cards)
-        indexes_shuffled = []
-        deck_shuffled = []
-        
-        while len(indexes_shuffled) < amount_of_cards_available:
-            num = randint(0, amount_of_cards_available-1)
-            if num not in indexes_shuffled:
-                indexes_shuffled.append(num)
-        
-        for i in range(amount_of_cards_available):
-            deck_shuffled.append(self.cards[indexes_shuffled[i]])
-        
-        self.cards = deck_shuffled
+        shuffle(self.cards)
             
         
     def is_empty(self):
@@ -51,31 +39,32 @@ class Deck:
     def create_new_deck_with_played_cards(self, played_cards):
         """
         It takes the played cards and create a new deck, then it returns
-        the self.get_deck() method that shuffles the deck and returns it
+        an instance of itself with the new deck
         """
         print("Creating new deck with the cards played...\n")
         self.cards = played_cards
-        return self.get_deck()
+        self.shuffle_deck()
+        return _Deck(self.cards)
 
 import unittest
 
 class TestDeck(unittest.TestCase):
     def test_empty_deck(self):
-        deck = Deck([])
+        deck = _Deck([])
         self.assertListEqual(deck.cards, [])
 
     def test_deck_with_cards(self):
-        deck = Deck([1,2,3,4,5])
+        deck = _Deck([1,2,3,4,5])
         self.assertListEqual(deck.cards, [1,2,3,4,5])
 
     def test_shuffled_deck_other_than_base_deck(self):
-        deck = Deck([1,2,3,4,5])
+        deck = _Deck([1,2,3,4,5])
         cards_before = deck.cards.copy()
         deck.shuffle_deck()
         self.assertNotEqual(deck.cards, cards_before)
 
     def test_draw_card(self):
-        deck = Deck([1,2,3,4,5])
+        deck = _Deck([1,2,3,4,5])
         card = deck.draw_card()
         self.assertEqual(card, 5)
         self.assertEqual(len(deck.cards), 4)
@@ -83,5 +72,5 @@ class TestDeck(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
     
-class NoMoreCards(Exception):
+class NoMoreCardsError(Exception):
     pass
