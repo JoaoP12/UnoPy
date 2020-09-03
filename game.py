@@ -1,4 +1,4 @@
-from deck import _Deck, NoMoreCardsError
+from deck import Deck, NoMoreCardsError
 from player import Player
 from card import Card, NormalCard, SpecialCard, CardType
 
@@ -6,7 +6,7 @@ class Game:
     def __init__(self, cards):
         self.players = []
         self.number_of_players = len(self.players)
-        self.deck = _Deck(cards)
+        self.deck = Deck(cards)
         self.deck.shuffle_deck()
         self.round = 0
         self.current_round_color = None
@@ -79,9 +79,9 @@ class Game:
         """
         Iterate trough the deck and return the first NormalCard to start the game
         """
-        for card in self.deck.cards:
+        for card in self.deck._cards:
             if type(card) == NormalCard:
-                return self.deck.cards.pop(self.deck.cards.index(card))
+                return self.deck._cards.pop(self.deck._cards.index(card))
     
     def count_points(self):
         """
@@ -161,31 +161,21 @@ class Game:
         
         colors_list = ['Blue', 'Green', 'Red', 'Yellow']
         print("Choose a color:\n")
-        
-        for i in range(3):
+        times = 0
+        while times <= 3:
             try:
                 color = int(input("1. Blue\n2. Green\n3. Red\n4. Yellow\n"))
-                
-            except ValueError:
-                while True:
+                if color not in [number for number in range(1, 5)]:
+                    raise InvalidNumberError
                     
-                    try:
-                        print("Please, type a valid option.\n")
-                        color = int(input("1. Blue\n2. Green\n3. Red\n4. Yellow\n"))
-                        break
-                    
-                    except ValueError:
-                        continue
-                    
-            if color not in [number for number in range(1, 5)]:
-                continue
+                return color
             
-            else:
-                self.current_round_color = colors_list[color-1]
-                break
-        else:
-            print("You lost your turn because of many invalid entries")
-            self.skip_player_turn()
+            except ValueError, InvalidNumberError:
+                times += 1
+                continue
+        
+        print("You lost your turn due to many invalid entries\n")
+        self.skip_player_turn()
         
     def has_valid_cards(self, players_cards):
         """
@@ -406,14 +396,14 @@ class TestGame(unittest.TestCase):
         self.assertTrue(self.game_example.skip_player)
     
     def test_check_players_cards(self):
-        self.game_example.deck = _Deck([self.special_card_1])
+        self.game_example.deck = Deck([self.special_card_1])
         self.game_example.cards_played.append(self.normal_card_1)
         self.game_example.draw_card_to_player(self.player_1)
         self.assertTrue(self.game_example.check_players_cards(self.player_1))
         
         self.game_example.cards_played = []
         
-        self.game_example.deck = _Deck([self.normal_card_2])
+        self.game_example.deck = Deck([self.normal_card_2])
         self.game_example.cards_played.append(self.normal_card_1)
         
         self.game_example.draw_card_to_player(self.player_2)
@@ -427,4 +417,6 @@ class TestGame(unittest.TestCase):
         
 if __name__ == "__main__":
     unittest.main()
-    
+
+class InvalidNumberError(Exception):
+    '''Raised when user don't enter a valid number'''
