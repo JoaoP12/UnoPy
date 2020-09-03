@@ -17,15 +17,14 @@ class NormalCard(Card):
     
     def __init__(self, color, name, points):
         super().__init__(name, color)
-        self.points = points
+        self._points = points
     
     def get_card_points(self):
         '''
-        Helper method that returns the points of the card. It was implemented to avoid the player method
-        get_card_points to be verbose.
+        Returns the points of the card
         '''
-        return self.points
-        
+        return self._points
+    
 class SpecialCard(Card):
     '''
     Stores the special cards of the game, those ones that have a special function
@@ -37,31 +36,20 @@ class SpecialCard(Card):
     
     def __init__(self, name, color=None):
         super().__init__(name, color)
-    
-    def get_special_cards_name(self):
-        '''
-        Returns a dictionary with the names of all the special cards' names and
-        the points according to each one.
-        '''
-        names = {
+        self._special_cards_names = {
             CardType.REVERSE: 20,
             CardType.SKIP: 20,
             CardType.DRAWTWO: 20,
             CardType.WILD: 50,
             CardType.WILDFOUR: 50
         }
-        return names
     
     def get_card_points(self):
         '''
-        Filters the name of the card according to the self.name instance variable.
-        After comparing it with the names of the special cards got from the self.get
-        _special_cards_name method.
-        Then it returns how many points does the card values according to its name.
+        It returns how many points does the card values according to its name.
         '''
-        special_cards_name = self.get_special_cards_name()
         
-        return special_cards_name[self.name]
+        return self._special_cards_name[self.name]
     
 class CardType(Enum):
     WILD = "Wild"
