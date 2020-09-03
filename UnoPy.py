@@ -5,24 +5,19 @@ deck = GenerateCards().get_cards()
 game_session = Game(deck)
 
 def menu():
+    invalid = True
     print("Welcome to UnoPy!\n")
-    try:
-        number_of_players = int(input("How many players will play today?\n Min: 2 players - Max: 10 players\n"))
-        while number_of_players < 2 or number_of_players > 10:
-            number_of_players = int(input("How many players will play today?\n Min: 2 players - Max: 10 players\n"))
-            
-    except ValueError:
-        while True:
-            try: 
-                print("Please type a valid number!")
-                while number_of_players < 2 or number_of_players > 10:
-                    number_of_players = int(input("How many players will play today?\n Min: 2 players - Max: 10 players\n"))
-                    
-                break
-            
-            except ValueError:
-                pass
-            
+    number_of_players = input("How many players will play today?\n Min: 2 players - Max: 10 players\n")
+    while invalid:
+        try:
+            if int(number_of_players) >= 2 and int(number_of_players <= 10):
+                invalid = False
+                number_of_players = int(number_of_players)
+            else:
+                number_of_players = int(input("How many players will play today?\n Min: 2 players - Max: 10 players\n"))
+        except ValueError:
+            continue
+        
     ask_players_names(number_of_players)
 
 def ask_players_names(number_of_players):
