@@ -1,4 +1,4 @@
-from deck import _Deck
+from deck import Deck
 from card import Card, NormalCard, SpecialCard, CardType
 
 class Player:
@@ -112,7 +112,7 @@ class TestPlayer(unittest.TestCase):
     def setUp(self):
         self.cards = []
         self.player = Player("Joao")
-        self.deck = _Deck(self.cards)
+        self.deck = Deck(self.cards)
         self.special_card_1 = SpecialCard(CardType.WILDFOUR)
         self.special_card_2 = SpecialCard(CardType.DRAWTWO, 'Yellow')
         self.special_card_3 = SpecialCard(CardType.REVERSE, 'Green')
