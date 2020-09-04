@@ -2,6 +2,11 @@ from deck import Deck, NoMoreCardsError
 from player import Player
 from card import Card, NormalCard, SpecialCard, CardType
 
+
+class InvalidNumberError(Exception):
+    '''Raised when user don't enter a valid number'''
+    pass
+
 class Game:
     def __init__(self, cards):
         self.players = []
@@ -21,22 +26,16 @@ class Game:
                     
             self.single_round()
     
+    '''
+    ============= Adaptação começa aqui ==================
+    '''
     def single_round(self):
         """
         This method "plays" a single round of the game calling the necessary methods and classes
         and print messages so the players know what is happening.
         """
-        self.round += 1
         
-        print("Starting round...")
-        
-        self.show_scoreboard()
-        print("Drawing a card to be the first...\n")
-        
-        first_card = self.draw_first_card()
-        print(f"The first card is --> {first_card.name} -- {first_card.color}")
-        self.cards_played.append(first_card)
-        self.current_round_color = first_card.color
+        self.start_round_settings()
         
         print(f"****** Round {self.round} ******\n")
         while True:
@@ -51,30 +50,78 @@ class Game:
                         continue
                 
                     print(f"{current_player.name}'s turn!")
-                
-                    if self.check_players_cards(current_player):
-                    
-                        possible_card = current_player.play()
-                    
-                        if type(possible_card) == NormalCard:
-                            if self.valid_play(possible_card):
-                                print(f"Player {current_player.name} played a {possible_card.color} {possible_card.name} card!")
+                    self.player_round(current_player, player)
+    
+    def player_round(self, player, player_index):
+        '''
+            ==================================================================================================
+            
+            ******************** NEEDS TO BE ADJUSTED AND ADAPTED WITH THE OTHER METHODS  ********************
+            
+            ==================================================================================================
+            
+            
+            
+            
+        '''
+        if self.check_players_cards(player):
                         
-                            else:
-                                while True:
-                                    possible_card = current_player.play()
-                                    if type(possible_card) == NormalCard and self.valid_play(possible_card):
-                                        break
-                                    elif type(possible_card) == SpecialCard:
-                                        self.check_special_card(current_player, possible_card, player+1)
-                                        break
-                    
+            possible_card = player.play()
+                        
+            if type(possible_card) == NormalCard:
+                if self.valid_play(possible_card):
+                   print(f"Player {player.name} played a {possible_card.color} {possible_card.name} card!")                        
+                else:
+                    while True:
+                        possible_card = player.play()
+                        if type(possible_card) == NormalCard and self.valid_play(possible_card):
+                            break
+                        elif type(possible_card) == SpecialCard:
+                            self.check_special_card(player, possible_card, player_index+1)
+                            break
+                        
                         else:
-                            self.check_special_card(current_player, possible_card, player+1)
-                        
-                        self.remove_card_from_player(current_player, possible_card)
-                        self.cards_played.append(possible_card)
+                            self.check_special_card(player, possible_card, player_index+1)
+    
+        self.remove_card_from_player(player, possible_card)
+        self.insert_played_card(possible_card)
+        
+    def draw_first_card(self):
+        """
+        Iterate trough the deck and return the first NormalCard to start the game
+        """
+        
+        
+        for card in self.deck._cards:
+            if type(card) == NormalCard:
+                card = self.deck._cards.pop(self.deck._cards.index(card))
                 
+        print(f"The first card is --> {card.name} -- {card.color}")
+        self.insert_card_played(card)
+        self.change_round_color(card.color)
+    
+    def start_round_settings(self):
+        self.round += 1
+            
+        print("Starting round...")
+            
+        self.show_scoreboard()
+        print("Drawing a card to be the first...\n")
+          
+        self.draw_first_card()
+    
+    
+    def change_round_color(self, color):
+        self.current_round_color = color
+    
+    def insert_card_played(self, card):
+        
+        self.cards_played.append(card)
+        
+    '''
+    ============= Adaptação terminal aqui ==================
+    '''
+    
     def draw_first_card(self):
         """
         Iterate trough the deck and return the first NormalCard to start the game
@@ -104,7 +151,7 @@ class Game:
         last_card_played = self.cards_played[-1]
         
         if type(possible_card) == NormalCard and type(last_card_played) == NormalCard:
-            if possible_card.color == self.current_round_color or possible_card.points == last_card_played.points:
+            if possible_card.color == self.current_round_color or possible_card._points == last_card_played._points:
                 return True
             
         elif type(last_card_played) == SpecialCard and type(possible_card) == SpecialCard:
@@ -168,14 +215,14 @@ class Game:
                 if color not in [number for number in range(1, 5)]:
                     raise InvalidNumberError
                     
-                return color
-            
-            except ValueError, InvalidNumberError:
+                self.change_round_color(colors_list[color-1])
+                return
+            except (ValueError, InvalidNumberError):
                 times += 1
                 continue
-        
-        print("You lost your turn due to many invalid entries\n")
-        self.skip_player_turn()
+        else: 
+            print("You lost your turn due to many invalid entries\n")
+            self.skip_player_turn()
         
     def has_valid_cards(self, players_cards):
         """
@@ -418,5 +465,3 @@ class TestGame(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-class InvalidNumberError(Exception):
-    '''Raised when user don't enter a valid number'''
