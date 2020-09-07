@@ -9,14 +9,14 @@ def menu():
     print("Welcome to UnoPy!\n")
     number_of_players = input("How many players will play today?\n Min: 2 players - Max: 10 players\n")
     while invalid:
-        try:
-            if int(number_of_players) >= 2 and int(number_of_players <= 10):
+        if number_of_players.isdigit(): 
+            if int(number_of_players) >= 2 and int(number_of_players) <= 10:
                 invalid = False
                 number_of_players = int(number_of_players)
             else:
                 number_of_players = int(input("How many players will play today?\n Min: 2 players - Max: 10 players\n"))
-        except ValueError:
-            continue
+        else:
+            print("You entered a non-integer value!")
         
     ask_players_names(number_of_players)
 
