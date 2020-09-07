@@ -53,7 +53,7 @@ class SpecialCard(Card):
     
 class CardType(Enum):
     WILD = "Wild"
-    WILDFOUR = "Wild draw four"
+    WILDFOUR = "Wild +4"
     DRAWTWO = "Draw two"
     SKIP = "Skip"
     REVERSE = "Reverse"
