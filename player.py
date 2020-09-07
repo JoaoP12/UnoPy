@@ -79,7 +79,14 @@ class Player:
         Adds a card to the player's cards
         """
         self.cards.append(card)
-        print(f"The card you got is \n {self.cards[-1].name} -- {self.cards[-1].color}")
+        if type(card) == NormalCard:
+            print(f"The card you got is \n {card.name} [{card.color}]")
+        elif card.name in [CardType.WILD, CardType.WILDFOUR]:
+            print(f"The card you got is \n {card.name.value}")
+        else:
+            print(f"The card you got is \n {card.name.value} [{card.color}]")
+            
+            
     
     def print_cards(self):
         """
@@ -90,7 +97,12 @@ class Player:
         card_index = 0
         
         for card in self.cards:
-            print(f"{card_index} --> {card.name} -- {card.color}")
+            if type(card) == NormalCard:
+                print(f"{card_index} --> {card.name} [{card.color}]")
+            elif card.name in [CardType.WILD, CardType.WILDFOUR]:
+                print(f"{card_index} --> {card.name.value}")
+            else:
+                print(f"{card_index} --> {card.name.value} [{card.color}]")
             card_index += 1
             
         return card_index
