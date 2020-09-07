@@ -25,10 +25,7 @@ class Game:
                 break
                     
             self.single_round()
-    
-    '''
-    ============= Adaptação começa aqui ==================
-    '''
+            
     def single_round(self):
         """
         This method "plays" a single round of the game calling the necessary methods and classes
@@ -54,16 +51,21 @@ class Game:
     
     def player_round(self, player, player_index):
         '''
-            ==================================================================================================
-            
-            ******************** NEEDS TO BE ADJUSTED AND ADAPTED WITH THE OTHER METHODS  ********************
-            
-            ==================================================================================================
-            
-            
-            
-            
+        Pass the current player to play and his/her index, then call the properly methods to ensure
+        the player's play is assigned.
         '''
+        
+        
+        
+        
+        
+        
+        '''
+            ************** ISN'T HANDLING SPECIAL CARDS **************************
+        '''
+        
+        
+        
         if self.check_players_cards(player):
                         
             possible_card = player.play()
@@ -84,7 +86,7 @@ class Game:
                             self.check_special_card(player, possible_card, player_index+1)
     
         self.remove_card_from_player(player, possible_card)
-        self.insert_played_card(possible_card)
+        self.insert_card_played(possible_card)
         
     def draw_first_card(self):
         """
@@ -96,11 +98,17 @@ class Game:
             if type(card) == NormalCard:
                 card = self.deck._cards.pop(self.deck._cards.index(card))
                 
-        print(f"The first card is --> {card.name} -- {card.color}")
+        print(f"The first card is --> {card.name} [{card.color}]")
         self.insert_card_played(card)
         self.change_round_color(card.color)
     
     def start_round_settings(self):
+        '''
+        It does everything needed to start a new round.
+        - Increases the round 'number'
+        - Shows the initial scoreboard
+        - Draws the first card to start playing
+        '''
         self.round += 1
             
         print("Starting round...")
@@ -112,24 +120,18 @@ class Game:
     
     
     def change_round_color(self, color):
+        '''
+        Receives a color as an argument and change the round color
+        '''
         self.current_round_color = color
     
     def insert_card_played(self, card):
+        '''
+        Receives the card that was played and append it to the cards played.
+        '''
         
         self.cards_played.append(card)
         
-    '''
-    ============= Adaptação terminal aqui ==================
-    '''
-    
-    def draw_first_card(self):
-        """
-        Iterate trough the deck and return the first NormalCard to start the game
-        """
-        for card in self.deck._cards:
-            if type(card) == NormalCard:
-                return self.deck._cards.pop(self.deck._cards.index(card))
-    
     def count_points(self):
         """
         Iterate trough the players and call the method player.get_cards_points that returns the total points
